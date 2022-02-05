@@ -1,0 +1,46 @@
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 20px 10px;
+    max-height: 100px;
+    background-color: #F7FAFC;
+    /* background-color: black; */
+    z-index: 1; 
+    
+}
+.footer_child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    width: 600px;
+    max-width: 100%;
+}
+.footer_content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1rem;
+    color: #999;
+}
+.footer_dot {
+    padding: 0 5px;
+}
+
+.App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 36px;
+    width: 36px;
+
+}
+
+@keyframes App-logo-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.link {
+    text-decoration: none;
+    color: #2bae66
+}

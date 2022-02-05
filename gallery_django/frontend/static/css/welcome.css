@@ -1,0 +1,33 @@
+.welcome {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 70vh;
+    background-color: black;
+} 
+
+/* This css does not do anything to the image idk why
+
+Update: 
+I know the reason now, I am a fucking idiot who didn't import the css.
+Nice fucking 3 hours debug
+*/
+
+.container {
+    display: block;
+    margin: auto;
+    padding: 50px;
+    width: 80%;
+    
+}
+.welcome_image {
+    display: block;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    margin: auto;
+    }
+.intro {
+    background-color: rgb(192, 226, 238);
+    padding: 50px;
+}

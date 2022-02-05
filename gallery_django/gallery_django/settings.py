@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-
+from .credentials import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, \
+            AWS_MYSQL_ENDPOINT, AWS_MYSQL_USERNAME, AWS_MYSQL_PASSWORD
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hl^5p+(f7mtei5*54^-=-_+^_7z9o73knwo2y57m4171-7y(@n'
+SECRET_KEY = 'django-insecure-(20^#)wg_w+a_srlnuq)48hgnbis#1))jfojwbjqcvk#&8gm4#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,8 +38,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
 
+    #3rd party app
+    'rest_framework',
+    'imagekit',
+
+    #local app
+    'api.apps.ApiConfig',
+    'frontend.apps.FrontendConfig',
+    'accounts.apps.AccountsConfig',
+]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        
+        ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+]
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -75,8 +94,15 @@ WSGI_APPLICATION = 'gallery_django.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'gallery',
+        'USER': AWS_MYSQL_USERNAME,
+        'PASSWORD': AWS_MYSQL_PASSWORD,
+        'HOST': AWS_MYSQL_ENDPOINT,
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
@@ -105,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Toronto'
 
 USE_I18N = True
 
@@ -121,3 +147,25 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#AWS S3 Settings
+AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = 'django-gallery-photos'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_FILE_OVERWRITE = True
+AWS_DEFAULT_ACL = None
+AWS_S3_VERIFY = True
+#This is set to custom because imagekit needs to reopen the closed photo
+DEFAULT_FILE_STORAGE = "gallery_django.storages.CustomS3Boto3Storage"
+
+MEDIA_URL = '{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
+
+#Imagekit that stores the thumbnail when the photo instance gets created instead of on request
+IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = 'imagekit.cachefiles.strategies.Optimistic'
+
+#Auto log out user while broser closes, SESSION_ENGINE set is necessory
+#SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+#SESSION_EXPIRE_AT_BROWSER_CLOSE=True

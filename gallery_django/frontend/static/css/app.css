@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+.App {
+  text-align: left;
+  font-family: 'Ubuntu',sans-serif;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.125rem;
+  position: relative;
+  min-height: 100vh;
+}
+a {
+  text-decoration: none;
+}
+
