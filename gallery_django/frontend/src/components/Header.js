@@ -13,7 +13,8 @@ export default class Header extends React.Component {
             <header className='header'>
                 <span className='span_wrapper'>
                     <Link to='/home' className='header_links'>
-                        <img src={logo} style={{width: 40, height: 30}}/>
+                        <span style={{ marginRight: '5px', height: 34}}>Memory Gallery</span>
+                        <span><img src={logo} style={{width: 40, height: 30}}/></span>
                         </Link>
                         
                     <span className='header_right'>

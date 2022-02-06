@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Welcome from "./components/Welcome"
 import Authentication from "./components/Authentication"
+import Account from "./components/Account"
 
 export default class App extends React.Component{
     constructor(props){
@@ -28,6 +29,8 @@ export default class App extends React.Component{
                 <Route path="/home" component={null}/>
 
                 <Route path="/authenticate" component={Authentication}/>
+
+                <Route path="/account/:username" component={Account}/>
 
             </Switch>
         </Router>

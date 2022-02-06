@@ -9,6 +9,7 @@
  h1, h2, h3, h4, h5, h6, p {
 	 margin: 0;
 }
+
 #entry-page {
 	 display: grid;
 	 grid-template-columns: 1fr minmax(200px, 400px) 1fr;
@@ -21,6 +22,7 @@
 	 animation: Gradient 15s ease infinite;
 	 box-sizing: border-box;
 }
+
 #entry-page form {
 	 grid-column: 2;
 	 grid-row: 2;

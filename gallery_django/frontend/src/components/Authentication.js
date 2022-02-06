@@ -1,17 +1,25 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
 import '../../static/css/authentication.css'
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import Button from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
+
 export default class Authentication extends React.Component {
 	// Note: the comment sections in this page is reserved for future scale
 	constructor(props){
-		super(props)
+		super(props) 
+
 		this.state = {
-		currentView: "signUp",
+		currentView: "logIn",
 		username: '',
 		password: '',
 		Authenticated_username: '',
 		errorMsg: '',
 		successMsg: '',
+		
 		}
 
 		this.handleUsernameFieldChange = this.handleUsernameFieldChange.bind(this)
@@ -40,8 +48,63 @@ export default class Authentication extends React.Component {
 		  password: e.target.value,
 		});
 	  }
-	async handleLoginFormSubitted(){
+	async handleLoginFormSubitted(e){
+		e.preventDefault()
+		fetch("/auth/csrf/")
+			.then(res => res.json())
+			.then(res => {
+				
+				const requestOptions = {
+					credentials: "include",
+					method: "POST",
+					mode: 'same-origin',
+					headers: { 
+						"Content-Type": "application/json",
+						'X-CSRFToken': res.csrfToken
+							},
+					body: JSON.stringify({
+						username: this.state.username,
+						password: this.state.password,
+					}),
+					};
+				return fetch("/auth/login/", requestOptions)
+					.then(res => {
+						if (res.ok){
+							this.setState({
+								successMsg: `Successfully login! Welcome ${this.state.username}`
+							})
+							return res.json()
 
+						}else{
+							//Warning:
+							//Do not raise a new error here then deal with it in the catch
+							//technically you can do this but you won't be able to set errorMsg
+							//as the error is not serializable like normal objects
+							//see this 
+							//https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
+							
+
+							return res.text().then(text => {
+
+								this.setState({
+									errorMsg: String(text).substring(1,String(text).length - 1)
+								})
+								throw new Error('Login failed')
+							})
+
+							// this.setState({
+							// 	errorMsg: 'Error Code: ' + res.status + ': ' + 'The login process failed, please try again.'
+							// })
+							
+						}})
+					.then((data) => {
+						sessionStorage.setItem('username', data.user.username)
+						this.props.history.push("/account/" + data.user.username)
+					})
+					.catch(error =>{
+						null
+					})
+			})
 	}
 	async handleRegisterFormSubitted(e){
 		e.preventDefault()
@@ -63,26 +126,42 @@ export default class Authentication extends React.Component {
 					}),
 					};
 				return fetch("/auth/register/", requestOptions)
-						.then(response => {
-							if (response.ok){
-								this.setState({
-									successMsg: `Successfully registered! Welcome ${this.state.username}`
-								})
-								return response.json()
-
-							}else{
-								throw new Error('The registration process failed, please try again.');
-							}})
-						.then((data) => {
-							sessionStorage.setItem('username', data.user.username)
-							this.props.history.push("/account/" + data.user.username)
-						})
-						.catch(error => {
-							console.log('failed ' + error) 
+					.then(res => {
+						if (res.ok){
 							this.setState({
-								errorMsg: error
+								successMsg: `Successfully registered! Welcome ${this.state.username}`
 							})
-						})
+							return res.json()
+
+						}else{
+							//Warning:
+							//Do not raise a new error here then deal with it in the catch
+							//technically you can do this but you won't be able to set errorMsg
+							//as the error is not serializable like normal objects
+							//see this 
+							//https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
+							
+
+							return res.text().then(text => {
+
+								this.setState({
+									errorMsg: String(text).substring(1,String(text).length - 1)
+								})
+								throw new Error('Registration failed')
+							})
+
+							// this.setState({
+							// 	errorMsg: 'Error Code: ' + res.status + ': ' + 'The registration process failed, please try again.'
+							// })
+							
+						}})
+					.then((data) => {
+						sessionStorage.setItem('username', data.user.username)
+						this.props.history.push("/account/" + data.user.username)
+					})
+					.catch(error =>{
+						null
+					})
 			})
 
 		}
@@ -101,6 +180,31 @@ export default class Authentication extends React.Component {
 			return (
 			<form onSubmit={this.handleRegisterFormSubitted}>
 				<h2>Sign Up!</h2>
+
+				<Collapse in={this.state.errorMsg != ''}>
+					<Alert
+					variant='filled'
+					severity='error'
+					action={
+						<IconButton
+						aria-label="close"
+						color="error"
+						size="small"
+						onClick={() => {
+							this.setState({
+								errorMsg: ''
+							})
+						}}
+						>
+						<CloseIcon fontSize="inherit" />
+						</IconButton>
+					}
+					>
+					{this.state.errorMsg}
+					</Alert>
+				</Collapse>
+			
+				
 				<fieldset>
 				<legend>Create Account</legend>
 				<ul>
@@ -128,8 +232,8 @@ export default class Authentication extends React.Component {
 					</li>
 				</ul>
 				</fieldset>
-				<button type="submit">Register</button>
-				<button type="button" onClick={ () => this.changeView("logIn")}>Have an Account?</button>
+				<Button variant='outlined' color='success' type="submit">Sign Up</Button>
+				<Button variant='outlined' color='success' onClick={ () => this.changeView("logIn")}>Have an Account?</Button>
 			</form>
 			)
 			break
@@ -137,6 +241,30 @@ export default class Authentication extends React.Component {
 			return (
 			<form onSubmit={this.handleLoginFormSubitted}>
 				<h2>Welcome Back!</h2>
+
+				<Collapse in={this.state.errorMsg != ''}>
+					<Alert
+					variant='filled'
+					severity='error'
+					action={
+						<IconButton
+						aria-label="close"
+						color="error"
+						size="small"
+						onClick={() => {
+							this.setState({
+								errorMsg: ''
+							})
+						}}
+						>
+						<CloseIcon fontSize="inherit" />
+						</IconButton>
+					}
+					>
+					{this.state.errorMsg}
+					</Alert>
+				</Collapse>
+
 				<fieldset>
 				<legend>Log In</legend>
 				<ul>
@@ -164,8 +292,8 @@ export default class Authentication extends React.Component {
 					</li> */}
 				</ul>
 				</fieldset>
-				<button type='submit'>Login</button>
-				<button type="button" onClick={ () => this.changeView("signUp")}>Create an Account</button>
+				<Button variant='outlined' color='primary' type='submit'>Login</Button>
+				<Button variant='outlined' color='primary' onClick={ () => this.changeView("signUp")}>Create an Account</Button>
 			</form>
 			)
 			break

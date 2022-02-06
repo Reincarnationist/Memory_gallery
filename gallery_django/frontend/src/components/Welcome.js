@@ -7,19 +7,33 @@ import { Link } from 'react-router-dom'
 export default class Welcome extends React.Component {
     constructor(props) {
         super(props);
-        
+        this.state = {
+            imageIsReady: false
+        }
       }
     
-    
+    componentDidMount() {
+        const img = new Image();
+        img.onload = () => {
+          // when it finishes loading, update the component state
+          this.setState({ imageIsReady: true });
+        }
+        img.src = welcome; // trigger browser download
+      
+      }
     render(){
+        let imageIsReady = this.state.imageIsReady
         return (
             <div className='welcome' >  
                 <div className='container' style={{backgroundColor: 'black'}}>
+                    imageIsReady ?
                     <img 
                         src={welcome} 
                         alt="Welcome picture" 
                         className='welcome_image'
                     />
+                    :
+                    <div>Loading image...</div>
                 </div>
                 
                 <div className='intro'>

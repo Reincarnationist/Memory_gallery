@@ -23,7 +23,8 @@ class RegisterView(APIView):
             login(request, user)
             return Response({
                 "user": UserSerializer(user).data},status=status.HTTP_201_CREATED)
-        return Response({"Bad Request": "Invalid Data..."},
+                
+        return Response({"Bad Request": serializer.errors.get('password',"Invalid Data...")},
                             status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
@@ -36,7 +37,9 @@ class LoginView(APIView):
             login(request, user)
             return Response({"user": UserSerializer(user).data},
                             status=status.HTTP_200_OK)
-        return Response({"Bad Request": "Invalid Data..."},
+
+        return Response({
+            "Bad Request": serializer.errors.get("non_field_errors", "Invalid Data...")},
                             status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
@@ -54,29 +57,28 @@ class ChangePasswordView(APIView):
     serializer_class = ChangePasswordSerializer
 
     def put(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
         user = request.user
-
-        if serializer.is_valid():
-            old_password = serializer.data.get('old_password')
-            new_password1 = serializer.data.get('new_password1')
-            new_password2 = serializer.data.get('new_password2')
-
-            if not user.check_password(old_password):
-                return Response({"Bad Request": "Wrong password."},
-                            status=status.HTTP_400_BAD_REQUEST)
-            elif new_password1 != new_password2:
+        if not user.check_password(request.data.get('old_password')):
+            return Response({"Bad Request": "Wrong password."},
+                        status=status.HTTP_400_BAD_REQUEST)
+        elif request.data.get('new_password1') != request.data.get('new_password2'):
                 return Response({"Bad Request": "Password fields must match."},
                             status=status.HTTP_400_BAD_REQUEST)
-            elif old_password == new_password1:
-                return Response({"Bad Request": "Old password can not be the same as previous one."},
-                            status=status.HTTP_400_BAD_REQUEST)
+        elif request.data.get('old_password') == request.data.get('new_password1'):
+            return Response({"Bad Request": "Old password can not be the same as previous one."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+        context = {'request':request}
+        serializer = self.serializer_class(data=request.data, context=context)
+
+        if serializer.is_valid():
+            new_password1 = serializer.data.get('new_password1')
             user.set_password(new_password1)
             user.save()
             update_session_auth_hash(request, user)
             return Response({'Message': 'Password update successfully.'}, status=status.HTTP_200_OK)
             
-        return Response({"Bad Request": "Invalid Data, please ensure your password length is less than 15."},
+        return Response({"Bad Request": serializer.errors.get("password", "Invalid Data")},
                             status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteUserView(APIView):
