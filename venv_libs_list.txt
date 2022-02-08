@@ -3,3 +3,5 @@ pip install djangorestframework
 pip install pymysql
 pip install django-imagekit
 pip install pillow
+pip install django-storages
+pip install boto3
