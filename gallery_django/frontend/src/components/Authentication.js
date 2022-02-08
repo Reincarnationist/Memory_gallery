@@ -57,7 +57,6 @@ export default class Authentication extends React.Component {
 				const requestOptions = {
 					credentials: "include",
 					method: "POST",
-					mode: 'same-origin',
 					headers: { 
 						"Content-Type": "application/json",
 						'X-CSRFToken': res.csrfToken
@@ -115,7 +114,6 @@ export default class Authentication extends React.Component {
 				const requestOptions = {
 					credentials: "include",
 					method: "POST",
-					mode: 'same-origin',
 					headers: { 
 						"Content-Type": "application/json",
 						'X-CSRFToken': res.csrfToken
