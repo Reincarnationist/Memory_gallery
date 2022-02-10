@@ -23,32 +23,21 @@ export default function DeleteAccount() {
   const [deleteErr, setDeleteErr] = React.useState(false);
   const [deleteErrMsg, setDeleteErrMsg] = React.useState('');
   const [deleteSucc, setDeleteSucc] = React.useState(false);
+  const [errorType, setErrorType] = React.useState('');
   const [confirm, setConfirm] = React.useState('');
   const CONFIRM = 'Delete My Account'
+  const CONFRIM_ERROR_MESSAGE = "Please type the confirm correctly"
+  const DELETE_SUCCESS_MESSAGE = "Delete Successfully!"
   const history = useHistory();
 
 
-  const handleConfirmBarClose = (event, reason) => {
+  const handleSnackBarClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-
-    setConfirmErr(false);
+    setErrorType('');
   };
-  const handleDeleteErrBarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
 
-    setDeleteErr(false);
-  };
-  const handleDeleteSuccBarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setDeleteSucc(false);
-  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -62,7 +51,7 @@ export default function DeleteAccount() {
     e.preventDefault()
     if (confirm !== CONFIRM){
         setConfirm('')
-        setConfirmErr(true);
+        setErrorType('confirm_error');
     }else{
 
     fetch("/auth/csrf/")
@@ -75,7 +64,7 @@ export default function DeleteAccount() {
                   },})
                 .then(res => {
                     if (res.ok){
-                        setDeleteSucc(true)
+                        setErrorType('delete_success')
                     }else{
                         //Warning:
                         //Do not raise a new error here then deal with it in the catch
@@ -86,7 +75,7 @@ export default function DeleteAccount() {
                         
 
                         return res.text().then(text => {
-                            setDeleteErr(true)
+                            setErrorType('delete_error')
                             setDeleteErrMsg(String(text).substring(1,String(text).length - 1))
                             throw new Error('Delete failed')
                         })
@@ -108,24 +97,24 @@ export default function DeleteAccount() {
 }
   return (
     <div>
-        {confirmErr && (
-        <Snackbar open={confirmErr} autoHideDuration={6000} onClose={handleConfirmBarClose}>
-        <Alert onClose={handleConfirmBarClose} severity="error" sx={{ width: '100%' }}>
-          Please type the confirm correctly
-        </Alert></Snackbar>)
-        }
-        {deleteErr && (
-        <Snackbar open={deleteErr} autoHideDuration={6000} onClose={handleDeleteErrBarClose}>
-        <Alert onClose={handleDeleteErrBarClose} severity="error" sx={{ width: '100%' }}>
-            {deleteErrMsg}
-        </Alert></Snackbar>)
-        }
-        {deleteSucc && (
-        <Snackbar open={deleteSucc} autoHideDuration={6000} onClose={handleDeleteSuccBarClose}>
-        <Alert onClose={handleDeleteSuccBarClose} severity="success" sx={{ width: '100%' }}>
-          Delete Successfully!
-        </Alert></Snackbar>)
-        }
+		{/* This seems stupid to have three similar elements here but they are essential.
+			Without indivial snackbar you will see a 0.5s error bar showing up after the 
+			successful bar gets closed, vice versa. */}
+        <Snackbar open={errorType==='confirm_error'} autoHideDuration={6000} onClose={handleSnackBarClose}>
+        <Alert onClose={handleSnackBarClose} severity="error" sx={{ width: '100%' }}>
+          {CONFRIM_ERROR_MESSAGE}
+        </Alert></Snackbar>
+
+		<Snackbar open={errorType==='delete_error_error'} autoHideDuration={6000} onClose={handleSnackBarClose}>
+        <Alert onClose={handleSnackBarClose} severity="error" sx={{ width: '100%' }}>
+          {deleteErrMsg}
+        </Alert></Snackbar>
+
+        <Snackbar open={errorType==='delete_success'} autoHideDuration={6000} onClose={handleSnackBarClose}>
+        <Alert onClose={handleSnackBarClose} severity="success" sx={{ width: '100%' }}>
+          {DELETE_SUCCESS_MESSAGE}
+        </Alert></Snackbar>
+        
       <Button variant="outlined" onClick={handleClickOpen}>
         Delete My Account
       </Button>

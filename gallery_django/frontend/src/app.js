@@ -7,7 +7,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Welcome from "./components/Welcome"
 import Authentication from "./components/Authentication"
-import Account from "./components/Account"
+import Account from "./components/AccountPage/Account"
 
 export default class App extends React.Component{
     constructor(props){
