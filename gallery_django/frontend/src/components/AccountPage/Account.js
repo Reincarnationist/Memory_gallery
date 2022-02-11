@@ -8,6 +8,8 @@ import Box from '@mui/material/Box';
 import { useHistory } from "react-router-dom";
 
 import DeletePanel from './DeleteAccount/DeleteAccountStack'
+import ChangePassword from './ChangePassword'
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -17,6 +19,7 @@ function TabPanel(props) {
 	  hidden={value !== index}
 	  id={`vertical-tabpanel-${index}`}
 	  aria-labelledby={`vertical-tab-${index}`}
+	  style={{width: '100%'}}
 	  {...other}
 	>
 	  {value === index && (
@@ -71,7 +74,7 @@ export default function VerticalTabs() {
 		sx={{ borderRight: 1, borderColor: 'divider' }}
 	  >
 		<Tab label="Change Password" {...a11yProps(0)} />
-		<Tab label="Change Email" disabled {...a11yProps(1)} /> //Feature that hasn't been implemented
+		<Tab label="Change Email" disabled {...a11yProps(1)} /> {/*Feature that hasn't been implemented */}
 		<Tab label="Change Profile Info" disabled {...a11yProps(2)} />
 		<Tab label="Change Security Questions" disabled {...a11yProps(3)} />
 		<Tab label="Bind Social Media" disabled {...a11yProps(4)} />
@@ -79,7 +82,7 @@ export default function VerticalTabs() {
 		<Tab label="Delete Account" style={{color: 'red', fontWeight: 800}} {...a11yProps(6)} />
 	  </Tabs>
 	  <TabPanel value={value} index={0}>
-		Item One
+		<ChangePassword />
 	  </TabPanel>
 	  <TabPanel value={value} index={1}>
 	  	Change Email

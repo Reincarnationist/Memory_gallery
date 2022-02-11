@@ -19,7 +19,6 @@ export default class Authentication extends React.Component {
 		Authenticated_username: '',
 		errorMsg: '',
 		successMsg: '',
-		
 		}
 
 		this.handleUsernameFieldChange = this.handleUsernameFieldChange.bind(this)

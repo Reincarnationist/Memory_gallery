@@ -50,7 +50,7 @@ class Photo(models.Model):
                                 )
     image_thumbnail = ImageSpecField(
                                 source='image',
-                                processors=[ResizeToFit(250,150)],
+                                processors=[ResizeToFit(250,250)],
                                 format='WEBP',
                                 options={'quality': 80},
                                 )
@@ -59,7 +59,7 @@ class Photo(models.Model):
 
     
     def __str__(self):
-        return '{}: {}'.format(self.unique_id, self.image)
+        return '{}:{}'.format(self.unique_id, self.image.url)
 
 
     #Kinda slow with PIL opening the whole image to process

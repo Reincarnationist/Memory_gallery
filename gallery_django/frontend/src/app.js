@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 import Welcome from "./components/Welcome"
 import Authentication from "./components/Authentication"
 import Account from "./components/AccountPage/Account"
-
+import Home from "./components/Home"
 export default class App extends React.Component{
     constructor(props){
         super(props)
@@ -26,7 +26,7 @@ export default class App extends React.Component{
           
                 <Route exact path="/" component={Welcome}/>
 
-                <Route path="/home" component={null}/>
+                <Route path="/home" component={Home}/>
 
                 <Route path="/authenticate" component={Authentication}/>
 

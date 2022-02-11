@@ -105,15 +105,15 @@ export default function Header(){
 					<nav className='menu'>
 						<ul className='menu_inner'>
 							<li><Link 
-									to="/myalbum" 
+									to="/home" 
 									className='header_links'
 									style={{
 										color: 'lightblue',
-									}}>My Collection</Link></li>
+									}}>Home</Link></li>
 							<li><Link 
-									to="/uploadalbum" 
+									to="/collection" 
 									className='header_links'
-									style={{color: ' #FF6F61'}}>Upload Memories</Link></li>
+									style={{color: ' #FF6F61'}}>My Collections</Link></li>
 							<li><Link 
 									to="/feelinglucky" 
 									className='header_links'

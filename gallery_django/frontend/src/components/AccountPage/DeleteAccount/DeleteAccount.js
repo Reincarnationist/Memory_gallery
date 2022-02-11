@@ -19,11 +19,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function DeleteAccount() {
 
   const [open, setOpen] = React.useState(false);
-  const [confirmErr, setConfirmErr] = React.useState(false);
-  const [deleteErr, setDeleteErr] = React.useState(false);
-  const [deleteErrMsg, setDeleteErrMsg] = React.useState('');
-  const [deleteSucc, setDeleteSucc] = React.useState(false);
   const [errorType, setErrorType] = React.useState('');
+  const [deleteErrMsg, setDeleteErrMsg] = React.useState('');
   const [confirm, setConfirm] = React.useState('');
   const CONFIRM = 'Delete My Account'
   const CONFRIM_ERROR_MESSAGE = "Please type the confirm correctly"
@@ -99,7 +96,8 @@ export default function DeleteAccount() {
     <div>
 		{/* This seems stupid to have three similar elements here but they are essential.
 			Without indivial snackbar you will see a 0.5s error bar showing up after the 
-			successful bar gets closed, vice versa. */}
+			successful bar gets closed, vice versa. 
+			Note: this can be fixed by adding one more state for opening/closing, leave it for later*/}
         <Snackbar open={errorType==='confirm_error'} autoHideDuration={6000} onClose={handleSnackBarClose}>
         <Alert onClose={handleSnackBarClose} severity="error" sx={{ width: '100%' }}>
           {CONFRIM_ERROR_MESSAGE}

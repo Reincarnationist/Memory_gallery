@@ -66,7 +66,7 @@ class UserDetailView(APIView):
         return Response({'Not Found': 'The user does not exist.'}, 
                                 status=status.HTTP_404_NOT_FOUND)
 #Any user can see these albums as long as they are public
-class GetAllPublicAlbums(APIView):
+class GetAllNonEmptyPublicAlbums(APIView):
     '''
         Get all the public albums info.
 
@@ -87,7 +87,8 @@ class GetAllPublicAlbums(APIView):
     serializer_class = AlbumSerializer
     def get(self, request, format=None):
         if self.albums.exists():
-            public_albums = Album.objects.filter(public=True)
+			# get all non-empty public albums
+            public_albums = Album.objects.exclude(photos__isnull=True)
             if public_albums.exists():
                 serializer = self.serializer_class(public_albums, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -538,6 +539,29 @@ class DeletePhoto(APIView):
 class RandomPublicAlbum(APIView):
     '''
         Randomly get a public album
+
+        url_param:
+            None
+            
+        Returns:
+            Success:
+                status 200
+                a list of ('unique_id', 'title', 'description', 'create_at', 'owner', 'public', 'photos')
+            
+            Failure:
+                Error 404 on not public album available
+
+    '''
+    def get(self, request, format=None):
+        album_count = Album.objects.filter(public=True).count()
+        if album_count > 0:
+            random_album = Album.objects.filter(public=True)[randint(0, album_count - 1)]
+            return Response(AlbumSerializer(random_album).data, status=status.HTTP_200_OK) 
+        return Response({'Not Found': 'No public album available.'}, status=status.HTTP_404_NOT_FOUND)
+
+class GetFirstPhotoFromAlbum(APIView):
+    '''
+        Get first photo from an album
 
         url_param:
             None
