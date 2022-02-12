@@ -97,7 +97,7 @@ export default class Authentication extends React.Component {
 						}})
 					.then((data) => {
 						sessionStorage.setItem('username', data.user.username)
-						this.props.history.push("/account/" + data.user.username)
+						this.props.history.push("/home")
 					})
 					.catch(error =>{
 						null

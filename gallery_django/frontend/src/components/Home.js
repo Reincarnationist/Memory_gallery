@@ -75,7 +75,7 @@ export default function Home() {
 								src={`${item.photos[0].slice(item.photos[0].indexOf(':') + 1)}`}
 								alt={item.title}
 								loading="lazy"
-								style={{width: '35vw', height: '50vh', objectFit: 'contain'}}
+								style={{width: '35vw', height: '50vh', objectFit: 'cover'}}
 							/>
 							<ImageListItemBar
 								title={item.title}

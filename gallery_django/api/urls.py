@@ -15,4 +15,9 @@ urlpatterns = [
     path('get-photo-from-album/', views.GetAllPhotoDetailFromAlbum.as_view()),
     path('upload-photo/', views.UploadPhotos.as_view()),
     path('delete-photo/', views.DeletePhoto.as_view()),
+	path('like-unlike-photo/', views.LikeOrUnlikeAPhoto.as_view()),
+	path('already-like-photo/', views.GetUserAlreadyLikePhoto.as_view()),
+	path('get-comment/', views.GetPhotoComment.as_view()),
+	path('create-comment/', views.CreatePhotoComment.as_view()),
+	path('delete-comment/', views.DeletePhotoComment.as_view()),
 ]
