@@ -9,6 +9,7 @@ import Welcome from "./components/Welcome"
 import Authentication from "./components/Authentication"
 import Account from "./components/AccountPage/Account"
 import Home from "./components/Home"
+import Collection from "./components/CollectionPage/Collection"
 export default class App extends React.Component{
     constructor(props){
         super(props)
@@ -31,6 +32,8 @@ export default class App extends React.Component{
                 <Route path="/authenticate" component={Authentication}/>
 
                 <Route path="/account/:username" component={Account}/>
+
+				<Route path="/collection/:username" component={Collection}/>
 
             </Switch>
         </Router>

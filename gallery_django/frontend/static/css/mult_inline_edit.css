@@ -1,0 +1,11 @@
+textarea {
+	resize: none;
+	overflow: hidden;
+	min-height: 14px;
+	max-height: 100px;
+  }
+
+textarea:focus {
+outline: 5px auto Highlight; /* Firefox */
+outline: 5px auto -webkit-focus-ring-color; /* Chrome, Safari */
+}
