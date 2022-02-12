@@ -31,7 +31,8 @@ class AlbumSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Album
 		fields = ('unique_id', 'title', 'description', 'create_at', 'owner', 'public', 'photos')
-
+		#performance boost
+		read_only_fields = fields
 class CreateAlbumSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Album
@@ -53,7 +54,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Photo
 		fields = ('unique_id', 'create_at', 'image', 'belong_to', 'num_of_likes', 'comments')
-
+		read_only_fields = fields
 class CreatePhotoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Photo
@@ -72,7 +73,7 @@ class CommentSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PhotoComment
 		fields = ('unique_id', 'owner', 'timestamp', 'content', 'belong_to')
-
+		read_only_fields = fields
 class CreateCommentSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PhotoComment

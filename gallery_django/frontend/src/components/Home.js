@@ -65,7 +65,7 @@ export default function Home() {
 						</Typography>
 				</Grid>
 				{albums.map((item) => (
-					<Grid item xs={6} key={item.photos[0]}>
+					<Grid item xs={3} key={item.photos[0]}>
 						
 						<a href="" target="_self" style={{color: 'black'}}>
 							<ImageListItem key={item.photos[0]}>
@@ -75,7 +75,7 @@ export default function Home() {
 								src={`${item.photos[0].slice(item.photos[0].indexOf(':') + 1)}`}
 								alt={item.title}
 								loading="lazy"
-								style={{width: '35vw', height: '50vh', objectFit: 'cover'}}
+								style={{width: 250, height: 250, objectFit: 'cover'}}
 							/>
 							<ImageListItemBar
 								title={item.title}

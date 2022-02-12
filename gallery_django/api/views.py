@@ -83,19 +83,15 @@ class GetAllNonEmptyPublicAlbums(APIView):
 				Error 404 on no albums exist
 
 	'''
-	albums = Album.objects.all()
 	serializer_class = AlbumSerializer
 	def get(self, request, format=None):
-		if self.albums.exists():
-			# get all non-empty public albums
-			public_albums = Album.objects.exclude(photos__isnull=True)
-			if public_albums.exists():
-				serializer = self.serializer_class(public_albums, many=True)
-				return Response(serializer.data, status=status.HTTP_200_OK)
+		# get all non-empty public albums
+		public_albums = Album.objects.exclude(photos__isnull=True).filter(public=True)
+		if public_albums.exists():
+			serializer = self.serializer_class(public_albums, many=True)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
-			return Response({'No Permission': 'No public albums available at the moment, and you are not allowed to see private albums.'}, 
-								status=status.HTTP_403_FORBIDDEN)
-		return Response({'Not Found': 'No albums at the moment.'}, 
+		return Response({'Not Found': 'No non-empty public albums found.'}, 
 								status=status.HTTP_404_NOT_FOUND)
 
 class GetUserOwnAlbums(APIView):

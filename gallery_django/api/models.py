@@ -56,14 +56,14 @@ class Photo(models.Model):
 								source='image',
 								processors=[ResizeToFit(250,250)],
 								format='WEBP',
-								options={'quality': 80},
+								options={'quality': 100},
 								)
 	class Meta:
 		ordering = ['create_at']
 
 	
 	def __str__(self):
-		return '{}:{}'.format(self.unique_id, self.image.url)
+		return '{}:{}'.format(self.unique_id, self.image_thumbnail.url)
 
 
 	#Kinda slow with PIL opening the whole image to process
