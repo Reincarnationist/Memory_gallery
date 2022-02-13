@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import DeleteWarning from './DeleteAccount'
 
 
-export default function DeleteAccountStack() {
+export default function DeleteAccountStack( {csrf_token} ) {
   return (
       <Stack
         direction="column"
@@ -19,7 +19,7 @@ export default function DeleteAccountStack() {
 
             Once you delete your account, there is no going back. Please be certain.
 
-            <DeleteWarning />
+            <DeleteWarning csrf_token={csrf_token} />
         </span>
       </Stack>
   );

@@ -44,7 +44,7 @@ function a11yProps(index) {
   };
 }
 
-export default function VerticalTabs() {
+export default function VerticalTabs( {csrf_token} ) {
   	const [value, setValue] = React.useState(0);
 	const history = useHistory();
   //check if the user is authenticated
@@ -82,7 +82,7 @@ export default function VerticalTabs() {
 		<Tab label="Delete Account" style={{color: 'red', fontWeight: 800}} {...a11yProps(6)} />
 	  </Tabs>
 	  <TabPanel value={value} index={0}>
-		<ChangePassword />
+		<ChangePassword csrf_token={csrf_token}/>
 	  </TabPanel>
 	  <TabPanel value={value} index={1}>
 	  	Change Email
@@ -100,7 +100,7 @@ export default function VerticalTabs() {
 		Item Six
 	  </TabPanel>
 	  <TabPanel value={value} index={6}>
-		  <DeletePanel />
+		  <DeletePanel csrf_token={csrf_token}/>
 	  </TabPanel>
 	</Box>
   );

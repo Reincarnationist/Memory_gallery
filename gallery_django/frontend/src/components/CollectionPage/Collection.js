@@ -9,7 +9,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
-export default function ChangePassword() {
+export default function ChangePassword( {csrf_token} ) {
 
   const [errorType, setErrorType] = React.useState('');
   const [pwChangeErrMsg, setPwChangeErrMsg] = React.useState('');
@@ -32,40 +32,36 @@ export default function ChangePassword() {
 		setErrorType('pw_not_match')
 		return
 	}
-    fetch("/auth/csrf/")
-        .then(res => res.json())
-        .then(res => {
-			const requestOptions = {
-				method: "PUT",
-				headers: { 
-					"Content-Type": "application/json",
-					'X-CSRFToken': res.csrfToken
-						},
-				body: JSON.stringify({
-					old_password: old_password,
-					new_password1: new_password1,
-					new_password2: new_password2,
-				}),
-				};
-            return fetch("/auth/change-password/", requestOptions)
-                .then(res => {
-                    if (res.ok){
-                        setErrorType('pwchange_success')
-                    }else{                        
-                        return res.text().then(text => {
-                            setErrorType('pwchange_error')
-                            setPwChangeErrMsg(String(text).substring(1,String(text).length - 1))
-                            throw new Error('pwchange failed')
-                        })
-                    }})
-                .then((data) => {
-					//nothing needs to be done after password change, the user will remain logged in
-					null  
-                })
-                .catch(error =>{
-                    null
-                })
-        })
+	const requestOptions = {
+		method: "PUT",
+		headers: { 
+			"Content-Type": "application/json",
+			'X-CSRFToken': csrf_token
+				},
+		body: JSON.stringify({
+			old_password: old_password,
+			new_password1: new_password1,
+			new_password2: new_password2,
+		}),
+		};
+	fetch("/auth/change-password/", requestOptions)
+		.then(res => {
+			if (res.ok){
+				setErrorType('pwchange_success')
+			}else{                        
+				return res.text().then(text => {
+					setErrorType('pwchange_error')
+					setPwChangeErrMsg(String(text).substring(1,String(text).length - 1))
+					throw new Error('pwchange failed')
+				})
+			}})
+		.then((data) => {
+			//nothing needs to be done after password change, the user will remain logged in
+			null  
+		})
+		.catch(error =>{
+			null
+		})
     
 }
   return (

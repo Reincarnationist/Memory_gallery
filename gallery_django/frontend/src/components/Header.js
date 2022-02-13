@@ -16,7 +16,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
-export default function Header(){
+export default function Header( {csrf_token} ){
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [authenticated, setAuthenticated] = React.useState(false);
 	const [authenticated_username, setAuthenticated_username] = React.useState('');
@@ -48,35 +48,34 @@ export default function Header(){
 	
 	const handleLogout = async e =>{
 		e.preventDefault()
-		fetch("/auth/csrf/")
-			.then(res => res.json())
+		
+		fetch("/auth/logout/", {
+		method: "POST",
+		headers: { 
+			'X-CSRFToken': csrf_token,
+			'mode': 'same-origin'
+			},})
 			.then(res => {
-				return fetch("/auth/logout/", {
-				method: "POST",
-				headers: { 
-					'X-CSRFToken': res.csrfToken
-					},})
-					.then(res => {
-						if (res.ok){
-							setErrorType('logout_success')
-						}else{
+				if (res.ok){
+					setErrorType('logout_success')
+				}else{
 
-							return res.text().then(text => {
-								setErrorType('logout_error')
-								setLogoutErrMsg(String(text).substring(1,String(text).length - 1))
-								throw new Error('Logout failed')
-							})
-						}})
-					.then((data) => {
-						setAuthenticated(false)
-						sessionStorage.removeItem('username')
-						setTimeout(() => history.push("/"), 3000);
-						
+					return res.text().then(text => {
+						setErrorType('logout_error')
+						setLogoutErrMsg(String(text).substring(1,String(text).length - 1))
+						throw new Error('Logout failed')
 					})
-					.catch(error =>{
-						null
-					})
+				}})
+			.then((data) => {
+				setAuthenticated(false)
+				sessionStorage.removeItem('username')
+				setTimeout(() => history.push("/"), 3000);
+				
 			})
+			.catch(error =>{
+				null
+			})
+
 	}
 	return (
 		<header className='header'>

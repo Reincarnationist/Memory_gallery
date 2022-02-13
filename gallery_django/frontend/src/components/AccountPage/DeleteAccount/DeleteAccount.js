@@ -16,7 +16,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
-export default function DeleteAccount() {
+export default function DeleteAccount( {csrf_token} ) {
 
   const [open, setOpen] = React.useState(false);
   const [errorType, setErrorType] = React.useState('');
@@ -51,45 +51,44 @@ export default function DeleteAccount() {
         setErrorType('confirm_error');
     }else{
 
-    fetch("/auth/csrf/")
-        .then(res => res.json())
-        .then(res => {
-            return fetch("/auth/delete-user/", {
-              method: "DELETE",
-              headers: { 
-                'X-CSRFToken': res.csrfToken
-                  },})
-                .then(res => {
-                    if (res.ok){
-                        setErrorType('delete_success')
-                    }else{
-                        //Warning:
-                        //Do not raise a new error here then deal with it in the catch
-                        //technically you can do this but you won't be able to set errorMsg
-                        //as the error is not serializable like normal objects
-                        //see this 
-                        //https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
-                        
+    
+	fetch("/auth/delete-user/", {
+		method: "DELETE",
+		headers: { 
+		'X-CSRFToken': csrf_token,
+		'mode': 'same-origin'
+			},})
+		.then(res => {
+			if (res.ok){
+				setErrorType('delete_success')
+			}else{
+				//Warning:
+				//Do not raise a new error here then deal with it in the catch
+				//technically you can do this but you won't be able to set errorMsg
+				//as the error is not serializable like normal objects
+				//see this 
+				//https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
+				
 
-                        return res.text().then(text => {
-                            setErrorType('delete_error')
-                            setDeleteErrMsg(String(text).substring(1,String(text).length - 1))
-                            throw new Error('Delete failed')
-                        })
+				return res.text().then(text => {
+					setErrorType('delete_error')
+					setDeleteErrMsg(String(text).substring(1,String(text).length - 1))
+					throw new Error('Delete failed')
+				})
 
-                        // this.setState({
-                        // 	errorMsg: 'Error Code: ' + res.status + ': ' + 'The login process failed, please try again.'
-                        // })
-                    }})
-                .then((data) => {
-                    sessionStorage.removeItem('username')
-                    setTimeout(() => history.push("/"), 3000);
-                    
-                })
-                .catch(error =>{
-                    null
-                })
-        })
+				// this.setState({
+				// 	errorMsg: 'Error Code: ' + res.status + ': ' + 'The login process failed, please try again.'
+				// })
+			}})
+		.then((data) => {
+			sessionStorage.removeItem('username')
+			setTimeout(() => history.push("/"), 3000);
+			
+		})
+		.catch(error =>{
+			null
+		})
+
     }
 }
   return (

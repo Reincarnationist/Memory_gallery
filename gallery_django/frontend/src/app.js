@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { render } from "react-dom";
 import '../static/css/app.css';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
@@ -10,41 +10,49 @@ import Authentication from "./components/Authentication"
 import Account from "./components/AccountPage/Account"
 import Home from "./components/Home"
 import Collection from "./components/CollectionPage/Collection"
-export default class App extends React.Component{
-    constructor(props){
-        super(props)
-    }
+export default function App(){
+	// This token will be changed silently after user login
+	// Authentication will reset the token after login
+    const [csrf_token, setCsrf_token] = React.useState('')
+
+	React.useEffect(() => {
+		fetch("/auth/csrf/")
+			.then(res => res.json())
+			.then(data => {
+				setCsrf_token(data.csrfToken)
+			})
+	  }, []);
 
 
-    render(){
-        return (
+    return (
         <div className="App" >
         
         <Router>
 
-            <Header />
+            <Header csrf_token={csrf_token}/>
             <Switch>
           
-                <Route exact path="/" component={Welcome}/>
+                <Route exact path="/" component={Welcome} />
 
-                <Route path="/home" component={Home}/>
+                <Route path="/home" render={()=><Home csrf_token={csrf_token}/>}/>
 
-                <Route path="/authenticate" component={Authentication}/>
+                <Route path="/authenticate" render={()=><Authentication csrf_token={csrf_token} setCsrfChange={setCsrf_token}/>}/>
 
-                <Route path="/account/:username" component={Account}/>
+                <Route path="/account/:username" render={()=><Account csrf_token={csrf_token}/>}/>
 
-				<Route path="/collection/:username" component={Collection}/>
+				<Route path="/collection/:username" render={()=><Collection csrf_token={csrf_token}/>}/>
 
             </Switch>
+
         </Router>
 
         
         <Footer />
       </div>
             
-            );
+    );
     }
-}
+
 
 const appDiv = document.getElementById('app');
 render(<App />, appDiv)
