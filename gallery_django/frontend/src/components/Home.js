@@ -41,7 +41,7 @@ export default function Home() {
 				setAlbums(data)
 				setReady(true)
 			})
-			.catch(error => null)
+			.catch(error => console.log(error))
 	  }, []);
 
 	  return ready ? (

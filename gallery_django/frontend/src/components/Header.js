@@ -40,10 +40,10 @@ export default function Header( {csrf_token} ){
 
 	React.useEffect(() => {
 		const logged_in_user = sessionStorage.getItem('username')
-			if (logged_in_user){
-				setAuthenticated(true)
-				setAuthenticated_username(logged_in_user)
-			}
+		if (logged_in_user){
+			setAuthenticated(true)
+			setAuthenticated_username(logged_in_user)
+		}
 	  });
 	
 	const handleLogout = async e =>{
@@ -73,7 +73,7 @@ export default function Header( {csrf_token} ){
 				
 			})
 			.catch(error =>{
-				null
+				console.log(error)
 			})
 
 	}
@@ -110,7 +110,7 @@ export default function Header( {csrf_token} ){
 										color: 'lightblue',
 									}}>Home</Link></li>
 							<li><Link 
-									to="/collection" 
+									to={`/collection/${authenticated_username}`}
 									className='header_links'
 									style={{color: ' #FF6F61'}}>My Collections</Link></li>
 							<li><Link 

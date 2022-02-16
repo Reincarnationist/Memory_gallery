@@ -35,9 +35,9 @@ export default function Authentication( {csrf_token, setCsrfChange} ) {
 
 	React.useEffect(() => {
 		const logged_in_user = sessionStorage.getItem('username')
-			if (logged_in_user){
-				setAuthenticated_username(logged_in_user)
-			}
+		if (logged_in_user){
+			setAuthenticated_username(logged_in_user)
+		}
 	});
 
 
@@ -95,7 +95,7 @@ export default function Authentication( {csrf_token, setCsrfChange} ) {
 				setTimeout(() => history.push("/home"), 1000)
 			})
 			.catch(error =>{
-				null
+				console.log(error)
 			})
 	}
 	const handleRegisterFormSubitted = async e =>{
@@ -153,7 +153,7 @@ export default function Authentication( {csrf_token, setCsrfChange} ) {
 				setTimeout(() => history.push("/account/" + data.user.username), 1000)
 			})
 			.catch(error =>{
-				null
+				console.log(error)
 			})
 
 		}

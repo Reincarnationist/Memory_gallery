@@ -1,6 +1,7 @@
 import * as React from 'react';
 import '../../../static/css/mult_inline_edit.css'
 
+// this is not in use for now
 export default function MultilineEdit ({ value, setValue }) {
 	const [editingValue, setEditingValue] = React.useState(value);
 

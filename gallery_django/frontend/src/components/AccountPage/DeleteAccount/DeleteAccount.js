@@ -86,7 +86,7 @@ export default function DeleteAccount( {csrf_token} ) {
 			
 		})
 		.catch(error =>{
-			null
+			console.log(error)
 		})
 
     }

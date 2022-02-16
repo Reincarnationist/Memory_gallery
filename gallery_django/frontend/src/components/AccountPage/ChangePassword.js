@@ -57,12 +57,8 @@ export default function ChangePassword( {csrf_token} ) {
 					throw new Error('pwchange failed')
 				})
 			}})
-		.then((data) => {
-			//nothing needs to be done after password change, the user will remain logged in
-			null  
-		})
 		.catch(error =>{
-			null
+			console.log(error)
 		})
         
     

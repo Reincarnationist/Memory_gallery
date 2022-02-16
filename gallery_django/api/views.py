@@ -127,7 +127,7 @@ class GetUserOwnAlbums(APIView):
 		return Response({'Not Found': 'You do not have any album at the moment.'}, 
 							status=status.HTTP_404_NOT_FOUND)
 
-class GetOtherUserPublicAlbums(APIView):
+class GetOtherUserNonEmptyPublicAlbums(APIView):
 	'''
 		Get a single user's public albums info.
 
@@ -156,7 +156,7 @@ class GetOtherUserPublicAlbums(APIView):
 		user_result = get_user_model().objects.filter(username=username)
 		if user_result.exists():
 			user = user_result[0]
-			albums = Album.objects.filter(owner=user, public=True)
+			albums = Album.objects.filter(owner=user, public=True).exclude(photos__isnull=True)
 			if albums.exists():
 				data = AlbumSerializer(albums, many=True).data
 				return Response(data, 

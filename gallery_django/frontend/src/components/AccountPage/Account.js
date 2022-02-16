@@ -9,7 +9,6 @@ import { useHistory } from "react-router-dom";
 
 import DeletePanel from './DeleteAccount/DeleteAccountStack'
 import ChangePassword from './ChangePassword'
-
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
