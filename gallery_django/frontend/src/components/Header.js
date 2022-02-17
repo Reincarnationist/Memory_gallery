@@ -110,7 +110,10 @@ export default function Header( {csrf_token} ){
 										color: 'lightblue',
 									}}>Home</Link></li>
 							<li><Link 
-									to={`/collection/${authenticated_username}`}
+									to={authenticated ? 
+										`/collection/${authenticated_username}`
+										:
+										'/authenticate'}
 									className='header_links'
 									style={{color: ' #FF6F61'}}>My Collections</Link></li>
 							<li><Link 

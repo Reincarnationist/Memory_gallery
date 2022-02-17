@@ -197,20 +197,19 @@ class CreateAlbum(APIView):
 		serializer = self.serializer_class(data=request.data)
 		if serializer.is_valid():
 			title = serializer.data.get('title')
+			check_same_title_qs = Album.objects.filter(owner=request.user, title=title)
+			if check_same_title_qs.exists():
+				return Response({'Bad Request': 'Album title already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 			description = serializer.data.get('description')
 			public = serializer.data.get('public')
-			queryset = Album.objects.filter(owner=request.user, title=title)
 
-			if queryset.exists():
-				return Response({'See Other': 'The Album already exists.'}, status=status.HTTP_303_SEE_OTHER)
-			else:
-				album = Album(
-					title=title, 
-					description=description, 
-					public=public,
-					owner = request.user)
-				album.save()
-				return Response(AlbumSerializer(album).data, status=status.HTTP_201_CREATED)
+			album = Album(
+				title=title, 
+				description=description, 
+				public=public,
+				owner = request.user)
+			album.save()
+			return Response(AlbumSerializer(album).data, status=status.HTTP_201_CREATED)
 			
 		return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -256,17 +255,20 @@ class UpdateAlbum(APIView):
 			serializer = self.serializer_class(data=request.data)
 			if serializer.is_valid():
 				title = serializer.data.get('title')
+				check_same_title_qs = Album.objects.filter(owner=request.user, title=title).exclude(unique_id=album_id)
+				if check_same_title_qs.exists():
+					return Response({'Bad Request': 'Album title already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 				description = serializer.data.get('description')
 				public = serializer.data.get('public')
 
-				if request.user != album.onwer:
+				if request.user != album.owner:
 					return Response({'FORBIDDEN': 'You do not have permisson.'}, status=status.HTTP_403_FORBIDDEN)
 				album.title = title
 				album.description = description
 				album.public = public
 				album.save(update_fields=['title', 'description', 'public'])
 				return Response(AlbumSerializer(album).data, status=status.HTTP_200_OK)
-			return Response({'Bad Request': 'Invalid Data...'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({"Bad Request": "Invalid Data..."}, status=status.HTTP_400_BAD_REQUEST)
 		return Response({'Not Found': 'The album does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
 		

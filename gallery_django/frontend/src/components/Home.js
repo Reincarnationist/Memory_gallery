@@ -64,8 +64,8 @@ export default function Home() {
 						Below are user uploaded albums, check them out!
 						</Typography>
 				</Grid>
-				{albums.map((item) => (
-					<Grid item xs={3} key={item.photos[0]}>
+				{albums.map((item, index) => (
+					<Grid item xs={3} key={index}>
 						
 						<a href="" target="_self" style={{color: 'black'}}>
 							<ImageListItem key={item.photos[0]}>

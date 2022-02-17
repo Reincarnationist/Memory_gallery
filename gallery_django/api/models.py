@@ -19,7 +19,7 @@ def user_directory_path(instance, filename):
 
 class Album(models.Model):
 	unique_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-	title = models.CharField(max_length=20, default='New Album', null=False, blank=False, unique=True)
+	title = models.CharField(max_length=20, default='New Album', null=False, blank=False)
 	description = models.CharField(max_length=100, null=True, blank=True)
 	create_at = models.DateTimeField(auto_now_add=True)
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='albums',on_delete=models.CASCADE)

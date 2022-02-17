@@ -35,6 +35,8 @@ export default function Collection( {csrf_token} ) {
 	const [description, setDescription] = React.useState('');
 	const [isPublic, setIsPublic] = React.useState(true);
 	const [album_editing_status, setAlbum_editing_status] = React.useState('');
+	const [current_album_id, setCurrent_album_id] = React.useState('');
+	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
 
 	const [albums, setAlbums] = React.useState([])
 	const [not_found, setNot_found] = React.useState(false)
@@ -100,6 +102,10 @@ export default function Collection( {csrf_token} ) {
 		setOpen(false);
 	};
 
+	const handleDelete_Dialog_Close = () => {
+		setDelete_dialog_open(false)
+	}
+
 	const handleRadioChange = (event) => {
 		setIsPublic(event.target.value === 'public' ? true: false);
 	};
@@ -144,7 +150,7 @@ export default function Collection( {csrf_token} ) {
 		
 	}
 
-	const handleUpdateAlbum = (album_id) => async e =>{
+	const handleUpdateAlbum = async e =>{
 		e.preventDefault()
 		const requestOptions = {
 			method: "PATCH",
@@ -158,7 +164,12 @@ export default function Collection( {csrf_token} ) {
 				public: isPublic,
 			}),
 		};
-		fetch("/api/update-album" + '?album_id=' + album_id, requestOptions)
+		if (current_album_id === ''){
+			console.log('album_id is empty.')
+			setErrorType('update_album_error')
+			return
+		}
+		fetch("/api/update-album" + '?album_id=' + current_album_id, requestOptions)
 			.then(res => {
 				if (res.ok){
 					setErrorType('update_album_success')
@@ -177,7 +188,7 @@ export default function Collection( {csrf_token} ) {
 		
 	}
 
-	const handleDeleteAlbum = (album_id) => async e =>{
+	const handleDeleteAlbum = async e =>{
 		e.preventDefault()
 		const requestOptions = {
 			method: "DELETE",
@@ -185,14 +196,21 @@ export default function Collection( {csrf_token} ) {
 				'X-CSRFToken': csrf_token
 			},
 		};
-		fetch("/api/delete-album" + '?album_id=' + album_id, requestOptions)
+
+		if (current_album_id === ''){
+			console.log('album_id is empty.')
+			setErrorType('delete_album_error')
+			return
+		}
+
+		fetch("/api/delete-album" + '?album_id=' + current_album_id, requestOptions)
 			.then(res => {
 				if (res.ok){
 					setErrorType('delete_album_success')
-					setOpen(false)
+					setDelete_dialog_open(false)
 				}else{                        
 					return res.text().then(text => {
-						setOpen(false)
+						setDelete_dialog_open(false)
 						setErrorType('delete_album_error')
 						setDeleteAlbumErrMsg(String(text).substring(1,String(text).length - 1))
 						throw new Error('Delete Album failed')
@@ -242,13 +260,17 @@ export default function Collection( {csrf_token} ) {
 					</DialogTitle>
 				<DialogContent>
 				<DialogContentText>
+					
 					{album_editing_status === 'create' ? 
-					"To create an album, please enter your the title and description. \
-					You can either set it as a public album or a private album. \
-					Of course, these are free to be changed afterwards. \
-					Note: You can't have two albums with same name."
+					`To create an album, please enter your the title and description. 
+					You can either set it as a public album or a private album. 
+					Of course, these are free to be changed afterwards. \n
+					Note: You can't have two albums with same name, 
+					and description must be less than 100 characters.`
 					:
-					'Updating the album.'}
+					`Updating the album. 
+					Note: You can't have two albums with same name, 
+					and description must be less than 100 characters.`}
 					
 				</DialogContentText>
 				<TextField
@@ -285,7 +307,27 @@ export default function Collection( {csrf_token} ) {
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={handleClose}>Cancel</Button>
-					<Button onClick={handleCreateAlbum}>Submit!</Button>
+					<Button onClick={album_editing_status==='create'?handleCreateAlbum:handleUpdateAlbum}>
+					{album_editing_status==='create'?'Create':'Update'}
+					</Button>
+				</DialogActions>
+			</Dialog>
+
+			{/* Delete Album form dialog*/}
+			<Dialog open={delete_dialog_open} onClose={handleDelete_Dialog_Close}>
+				<DialogTitle>
+					Delete Album
+					</DialogTitle>
+				<DialogContent>
+				<DialogContentText>
+					This action cannot be undo, are you sure you want to delete the album?		
+				</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handleDelete_Dialog_Close}>Cancel</Button>
+					<Button onClick={handleDeleteAlbum} color='error'>
+					Delete
+					</Button>
 				</DialogActions>
 			</Dialog>
 
@@ -303,7 +345,15 @@ export default function Collection( {csrf_token} ) {
 				<Button 
 					variant="contained" 
 					color='primary'
-					onClick={() => {setOpen(true); setAlbum_editing_status('create')}}
+					onClick={() => {
+						setOpen(true); 
+						setAlbum_editing_status('create');
+						// below is for the case the user clicks the update button then close them
+						// need to reset the value
+						setTitle('New Album');
+						setDescription('');
+						setIsPublic(true);
+						}}
 					>Create An Album</Button>
 				</Grid>
 			}
@@ -316,8 +366,8 @@ export default function Collection( {csrf_token} ) {
 					</Typography>
 				</Grid>	)
 				:
-					albums.map((item) => (
-						<Grid item xs={3} key={item.photos[0]}>
+					albums.map((item, index) => (
+						<Grid item xs={3} key={index}>
 							<Card sx={{ 
 									maxWidth: 250, 
 									height: '100%',
@@ -342,16 +392,26 @@ export default function Collection( {csrf_token} ) {
 								<CardActions>
 									<Button 
 										variant='contained' 
-										size="small">Explore Album</Button>
+										size="small">Explore</Button>
 									<Button 
 										variant='contained' 
 										size="small"
-										onClick={handleUpdateAlbum(item.unique_id)}>Update Album</Button>
+										onClick={() => {
+											setOpen(true); 
+											setAlbum_editing_status('update');
+											setCurrent_album_id(item.unique_id);
+											setTitle(item.title);
+											setDescription(item.description);
+											setIsPublic(item.public);
+											}}>Update</Button>
 									<Button 
 										variant='contained' 
 										size="small" 
 										color='error'
-										onClick={handleDeleteAlbum(item.unique_id)}>Delete Album</Button>
+										onClick={() =>{
+											setDelete_dialog_open(true); 
+											setCurrent_album_id(item.unique_id);
+										}}>Delete</Button>
 								</CardActions>
 							</Card>
 						</Grid>
