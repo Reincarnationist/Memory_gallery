@@ -111,8 +111,9 @@ export default function DeleteAccount( {csrf_token} ) {
         <Alert onClose={handleSnackBarClose} severity="success" sx={{ width: '100%' }}>
           {DELETE_SUCCESS_MESSAGE}
         </Alert></Snackbar>
-        
-      <Button variant="outlined" onClick={handleClickOpen}>
+		
+        <br />
+      <Button variant='contained' color='error' onClick={handleClickOpen}>
         Delete My Account
       </Button>
       <Dialog open={open} onClose={handleCancel}>
@@ -133,8 +134,8 @@ export default function DeleteAccount( {csrf_token} ) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancel</Button>
-          <Button onClick={handleDelete}>Delete</Button>
+          <Button variant='contained' onClick={handleCancel}>Cancel</Button>
+          <Button variant='contained' color='error' onClick={handleDelete}>Delete</Button>
         </DialogActions>
       </Dialog>
     </div>

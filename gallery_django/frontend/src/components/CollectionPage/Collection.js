@@ -386,13 +386,23 @@ export default function Collection( {csrf_token} ) {
 									{item.title}
 									</Typography>
 									<Typography variant="body2" color="text.secondary">
-									description: {item.description}
+									description: {
+									item.description===null?
+									'The user did not write anything about this album':
+									item.description}
+									</Typography>
+									<Typography variant="body2" color="text.secondary">
+										{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
+									Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
 									</Typography>
 								</CardContent>
 								<CardActions>
+									
 									<Button 
 										variant='contained' 
-										size="small">Explore</Button>
+										size="small"
+										>Explore</Button>
+									{isOwner && 
 									<Button 
 										variant='contained' 
 										size="small"
@@ -403,7 +413,8 @@ export default function Collection( {csrf_token} ) {
 											setTitle(item.title);
 											setDescription(item.description);
 											setIsPublic(item.public);
-											}}>Update</Button>
+											}}>Update</Button>}
+									{isOwner && 
 									<Button 
 										variant='contained' 
 										size="small" 
@@ -411,7 +422,7 @@ export default function Collection( {csrf_token} ) {
 										onClick={() =>{
 											setDelete_dialog_open(true); 
 											setCurrent_album_id(item.unique_id);
-										}}>Delete</Button>
+										}}>Delete</Button>}
 								</CardActions>
 							</Card>
 						</Grid>
