@@ -1,14 +1,20 @@
 import * as React from 'react';
-import Grid from '@mui/material/Grid';
-import { Typography } from '@mui/material';
-import ImageListItem from '@mui/material/ImageListItem';
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import { 
+	Grid,
+	Typography,
+	CircularProgress,
+	Box,
+	Card,
+	CardContent,
+	CardMedia,
+	Button,
+	CardActionArea,
+	CardActions } from '@mui/material';
+
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-
+import { useHistory } from 'react-router-dom'
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
@@ -17,7 +23,7 @@ export default function Home() {
 	const [albums, setAlbums] = React.useState([])
 	const [ready, setReady] = React.useState(false)
 	const [getPublicAlbumsErrMsg, setGetPublicAlbumsErrMsg] = React.useState('')
-
+	const history = useHistory()
 	const handleSnackBarClose = (event, reason) => {
 		if (reason === 'clickaway') {
 		  return;
@@ -66,27 +72,49 @@ export default function Home() {
 				</Grid>
 				{albums.map((item, index) => (
 					<Grid item xs={3} key={index}>
-						
-						<a href="" target="_self" style={{color: 'black'}}>
-							<ImageListItem key={index}>
-							<img
-							// this is dangerous as item.photos can be empty, this is the only
-							// place I will use it because the api will only retrieve non-empty albums
-								src={`${item.photos[0].slice(item.photos[0].indexOf(':') + 1)}`}
-								alt={item.title}
-								loading="lazy"
-								style={{width: 250, height: 250, objectFit: 'cover'}}
-							/>
-							<ImageListItemBar
-								title={item.title}
-								subtitle={<span>by: {item.owner}</span>}
-								position="below"
-								style={{textAlign: 'center'}}
-							/>
-						</ImageListItem>
-						</a>
+						<Card sx={{ 
+								maxWidth: 300, 
+								height: '100%',
+								display: 'flex', 
+								justifyContent: 'space-between', 
+								flexDirection: 'column' }}>
+							<CardActionArea onClick={() => history.push(`/collection/${item.owner}/${item.unique_id}`)}>
+								<CardMedia
+									component="img"
+									alt={item.title}
+									height="300"
+									image={`${item.photos[0].slice(item.photos[0].indexOf(':') + 1)}`}
+									// style={{width: 250, height: 250, objectFit: 'cover'}}
+								/>
+								<CardContent>
+									<Typography gutterBottom variant="h5" component="div">
+									{item.title}
+									</Typography>
+									<Typography variant="body2" color="text.secondary">
+									Description: {
+									item.description===null?
+									'The user did not write anything about this album':
+									item.description}
+									</Typography>
+									<br />
+									<Typography variant="body2" color="text.secondary">
+										{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
+									Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
+									</Typography>
+								</CardContent>
+							</CardActionArea>
+							
+							<CardActions>
+								By: 
+								<Button 
+									variant='text' 
+									size="small"
+									onClick={() => history.push(`/collection/${item.owner}`)}
+									>{item.owner}</Button>
+							</CardActions>
+						</Card>
 					</Grid>
-				))}
+					))}
 			</Grid>
 	  )
 	  :

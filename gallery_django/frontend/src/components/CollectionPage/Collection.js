@@ -18,9 +18,10 @@ import {
 		Card,
 		CardActions,
 		CardContent,
-		CardMedia  } from '@mui/material';
+		CardMedia,
+		CardActionArea  } from '@mui/material';
 
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -28,6 +29,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function Collection( {csrf_token} ) {
 	const params = useParams()
 	const username_param = params.username
+	const history = useHistory()
 
 	const [isOwner, setIsOwner] = React.useState(false);
 	const [open, setOpen] = React.useState(false);
@@ -66,7 +68,6 @@ export default function Collection( {csrf_token} ) {
 						}
 					})
 					.then(data => {
-						console.log(data)
 						for (let i = 0; i < data.length; i++){
 							if (data[i].photos.length === 0){
 								data[i].photos.push(empty)
@@ -369,41 +370,39 @@ export default function Collection( {csrf_token} ) {
 					albums.map((item, index) => (
 						<Grid item xs={3} key={index}>
 							<Card sx={{ 
-									maxWidth: 250, 
-									height: '100%',
+									maxWidth: 300, 
+									height: isOwner?'100%':'80%',
 									display: 'flex', 
 									justifyContent: 'space-between', 
 									flexDirection: 'column' }}>
-								<CardMedia
-									component="img"
-									alt={item.title}
-									height="250"
-									image={`${item.photos[0].slice(item.photos[0].indexOf(':') + 1)}`}
-									// style={{width: 250, height: 250, objectFit: 'cover'}}
-								/>
-								<CardContent>
-									<Typography gutterBottom variant="h5" component="div">
-									{item.title}
-									</Typography>
-									<Typography variant="body2" color="text.secondary">
-									Description: {
-									item.description===null?
-									'The user did not write anything about this album':
-									item.description}
-									</Typography>
-									<br />
-									<Typography variant="body2" color="text.secondary">
-										{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
-									Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
-									</Typography>
-								</CardContent>
+								<CardActionArea onClick={() => history.push(`/collection/${username_param}/${item.unique_id}`)}>
+									<CardMedia
+										component="img"
+										alt={item.title}
+										height="300"
+										image={`${item.photos[0].slice(item.photos[0].indexOf(':') + 1)}`}
+										// style={{width: 250, height: 250, objectFit: 'cover'}}
+									/>
+									<CardContent>
+										<Typography gutterBottom variant="h5" component="div">
+										{item.title}
+										</Typography>
+										<Typography variant="body2" color="text.secondary">
+										Description: {
+										item.description===null?
+										'The user did not write anything about this album':
+										item.description}
+										</Typography>
+										<br />
+										<Typography variant="body2" color="text.secondary">
+											{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
+										Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
+										</Typography>
+									</CardContent>
+								</CardActionArea>
+								
+								{isOwner && 
 								<CardActions>
-									
-									<Button 
-										variant='contained' 
-										size="small"
-										>Explore</Button>
-									{isOwner && 
 									<Button 
 										variant='contained' 
 										size="small"
@@ -414,8 +413,8 @@ export default function Collection( {csrf_token} ) {
 											setTitle(item.title);
 											setDescription(item.description);
 											setIsPublic(item.public);
-											}}>Update</Button>}
-									{isOwner && 
+											}}>Update</Button>
+									
 									<Button 
 										variant='contained' 
 										size="small" 
@@ -423,8 +422,8 @@ export default function Collection( {csrf_token} ) {
 										onClick={() =>{
 											setDelete_dialog_open(true); 
 											setCurrent_album_id(item.unique_id);
-										}}>Delete</Button>}
-								</CardActions>
+										}}>Delete</Button>
+								</CardActions>}
 							</Card>
 						</Grid>
 					))

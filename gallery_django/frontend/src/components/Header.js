@@ -24,6 +24,9 @@ export default function Header( {csrf_token} ){
 	const [logoutErrMsg, setLogoutErrMsg] = React.useState('')
 	const open = Boolean(anchorEl);
 	const history = useHistory()
+	
+
+	
 	const handleClick = (event) => {
 		setAnchorEl(event.currentTarget);
 	};

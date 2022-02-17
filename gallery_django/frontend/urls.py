@@ -6,5 +6,5 @@ urlpatterns = [
     path('authenticate/', views.index),
     path('account/<str:username>', views.index),
 	path('collection/<str:username>/', views.index),
-	path('collection/<str:username>/<str:album_id>', views.index),
+	path('collection/<str:username>/<uuid:album_id>', views.index),
 ]

@@ -26,6 +26,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	const username_param = params.username
 	const album_id = params.album_id
 
+	const [album_title, setAlbum_title] = React.useState('');
 	const [isOwner, setIsOwner] = React.useState(false);
 	const [current_photo_id, setCurrent_photo_id] = React.useState('');
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
@@ -66,6 +67,7 @@ export default function AlbumDetail( {csrf_token} ) {
 			})
 			.then(data => {
 				setPhotos(data)
+				album_title === '' ? setAlbum_title(data[0].belong_to) : null
 			})
 			.catch(error => console.log(error))
 
@@ -210,7 +212,7 @@ export default function AlbumDetail( {csrf_token} ) {
 
 			<Grid item xs={isOwner? 8:12}>
 				<Typography variant="h3" component="div" style={{color: '#34568B'}}>
-					You can broswer all the photos in this album now! 
+					You can broswer all the photos in {album_title} now! 
 					</Typography>
 				<Typography variant="h4" component="h4">
 					Like or leave a comment if you see some interesting/beautiful photos.
@@ -237,15 +239,15 @@ export default function AlbumDetail( {csrf_token} ) {
 					photos.map((item, index) => (
 						<Grid item xs={3} key={index}>
 							<Card sx={{ 
-									maxWidth: 250, 
-									height: '100%',
+									maxWidth: 300, 
+									maxHeight: 350,
 									display: 'flex', 
 									justifyContent: 'space-between', 
 									flexDirection: 'column' }}>
 								<CardMedia
 									component="img"
 									alt={`photo of ${album_id}`}
-									height="250"
+									height="300"
 									image={item.thumb}
 									// style={{width: 250, height: 250, objectFit: 'cover'}}
 								/>

@@ -11,6 +11,7 @@ import Account from "./components/AccountPage/Account"
 import Home from "./components/Home"
 import Collection from "./components/CollectionPage/Collection"
 import AlbumDetail from "./components/AlbumDetailPage/AlbumDetail"
+import { getThemeProps } from "@mui/system";
 
 export default function App(){
 	// This token will be changed silently after user login
@@ -31,9 +32,10 @@ export default function App(){
         
         <Router>
 
-            <Header csrf_token={csrf_token}/>
+			<Header csrf_token={csrf_token}/>
+
             <Switch>
-          
+				
                 <Route exact path="/" component={Welcome} />
 
                 <Route path="/home" render={()=><Home csrf_token={csrf_token}/>}/>
@@ -42,7 +44,8 @@ export default function App(){
 
                 <Route path="/account/:username" render={()=><Account csrf_token={csrf_token}/>}/>
 
-				<Route exact path="/collection/:username" render={()=><Collection csrf_token={csrf_token}/>}/>
+				{/* Note on the props and key attribute. In order to re-render the collection page when the parmas 'username' changes, the key is necessary */}
+				<Route exact path="/collection/:username" render={(props)=><Collection csrf_token={csrf_token} key={props.match.params.username} {...props}/>}/>
 
 				<Route path="/collection/:username/:album_id" render={()=><AlbumDetail csrf_token={csrf_token}/>}/>
 
