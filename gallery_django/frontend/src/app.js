@@ -10,6 +10,8 @@ import Authentication from "./components/Authentication"
 import Account from "./components/AccountPage/Account"
 import Home from "./components/Home"
 import Collection from "./components/CollectionPage/Collection"
+import AlbumDetail from "./components/AlbumDetailPage/AlbumDetail"
+
 export default function App(){
 	// This token will be changed silently after user login
 	// Authentication will reset the token after login
@@ -40,7 +42,9 @@ export default function App(){
 
                 <Route path="/account/:username" render={()=><Account csrf_token={csrf_token}/>}/>
 
-				<Route path="/collection/:username" render={()=><Collection csrf_token={csrf_token}/>}/>
+				<Route exact path="/collection/:username" render={()=><Collection csrf_token={csrf_token}/>}/>
+
+				<Route path="/collection/:username/:album_id" render={()=><AlbumDetail csrf_token={csrf_token}/>}/>
 
             </Switch>
 

@@ -80,7 +80,7 @@ export default function Collection( {csrf_token} ) {
 		}
 
 		// non-login users and non-owner users
-		fetch('/api/get-user-public-albums/' + '?username=' + username_param, {method: "GET"})
+		fetch('/api/get-user-public-albums' + '?username=' + username_param, {method: "GET"})
 			.then(res => {
 				if (res.ok){
 					return res.json()
@@ -386,11 +386,12 @@ export default function Collection( {csrf_token} ) {
 									{item.title}
 									</Typography>
 									<Typography variant="body2" color="text.secondary">
-									description: {
+									Description: {
 									item.description===null?
 									'The user did not write anything about this album':
 									item.description}
 									</Typography>
+									<br />
 									<Typography variant="body2" color="text.secondary">
 										{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
 									Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}

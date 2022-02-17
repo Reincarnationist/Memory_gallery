@@ -14,7 +14,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   });
 
 export default function Home() {
-	const [albums, setAlbums] = React.useState('')
+	const [albums, setAlbums] = React.useState([])
 	const [ready, setReady] = React.useState(false)
 	const [getPublicAlbumsErrMsg, setGetPublicAlbumsErrMsg] = React.useState('')
 
@@ -68,7 +68,7 @@ export default function Home() {
 					<Grid item xs={3} key={index}>
 						
 						<a href="" target="_self" style={{color: 'black'}}>
-							<ImageListItem key={item.photos[0]}>
+							<ImageListItem key={index}>
 							<img
 							// this is dangerous as item.photos can be empty, this is the only
 							// place I will use it because the api will only retrieve non-empty albums
