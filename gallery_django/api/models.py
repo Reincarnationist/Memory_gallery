@@ -7,6 +7,9 @@ from django.core.exceptions import ValidationError
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
+
+from .ImageOptions  import THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, \
+	THUMBNAIL_COMPRESS_QUALITY, THUMBNAIL_FORMAT
 #from PIL import Image as pImage
 #from PIL.ExifTags import TAGS
 # Create your models here.
@@ -54,9 +57,9 @@ class Photo(models.Model):
 								)
 	image_thumbnail = ImageSpecField(
 								source='image',
-								processors=[ResizeToFit(250,250)],
-								format='WEBP',
-								options={'quality': 100},
+								processors=[ResizeToFit(THUMBNAIL_WIDTH,THUMBNAIL_HEIGHT)],
+								format=THUMBNAIL_FORMAT,
+								options={'quality': THUMBNAIL_COMPRESS_QUALITY},
 								)
 	class Meta:
 		ordering = ['create_at']

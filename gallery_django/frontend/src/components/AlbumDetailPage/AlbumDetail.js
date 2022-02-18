@@ -137,6 +137,9 @@ export default function AlbumDetail( {csrf_token} ) {
 		fetch("/api/upload-photo/" + '?album_id=' + album_id, requestOptions)
 			.then(res => {
 				if (res.ok){
+					setUpload_dialog_open(false)
+					setPhotoAsFile(null)
+					setPhotoNames([])
 					setErrorType('upload_photos_success')
 				}else{                        
 					return res.text().then(text => {
