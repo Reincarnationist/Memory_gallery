@@ -195,6 +195,9 @@ class CreateAlbum(APIView):
 
 	def post(self, request, format=None):
 		serializer = self.serializer_class(data=request.data)
+		if Album.objects.filter(owner=request.user).count() > 9:
+				return Response({'Bad Request': 'The maximum number of album you can have is 10'}, 
+				status=status.HTTP_400_BAD_REQUEST)
 		if serializer.is_valid():
 			title = serializer.data.get('title')
 			check_same_title_qs = Album.objects.filter(owner=request.user, title=title)
@@ -449,19 +452,22 @@ class UploadPhotos(APIView):
 		album_result = Album.objects.filter(unique_id=album_id)
 		if album_result.exists():
 			album = album_result[0]
-
+			if album.photos.count() >= 50:
+				return Response({'Bad Request': 'The maximum number of photos you can have per album is 50'}, 
+				status=status.HTTP_400_BAD_REQUEST)
 			#Only owner can upload photos
 			if request.user != album.owner:
 				return Response({'FORBIDDEN': 'You do not have permisson.'}, 
 										status=status.HTTP_403_FORBIDDEN)
 			
 			response_list = []
-			images = request.FILES.getlist('image')
+			images = request.FILES.getlist('images')
 			if not images:
 				return Response({'Bad Request': "Can't upload empty file"}, status=status.HTTP_400_BAD_REQUEST)
-			for image in images:
-				serializer = self.serializer_class(data=request.data)
-				if serializer.is_valid():
+			
+			serializer = self.serializer_class(data=request.data, many=True)
+			if serializer.is_valid():
+				for image in images:
 					photo = Photo(
 								image=image,
 								belong_to=album
@@ -484,11 +490,12 @@ class UploadPhotos(APIView):
 					data = PhotoSerializer(photo).data
 					data['thumb'] = photo.image_thumbnail.url
 					response_list.append(data)
-					
-				else:
-					return Response({'Bad Request': 'Possibly you have the wrong file extension or '\
-						'the file is too large.'}, status=status.HTTP_400_BAD_REQUEST)
-			return Response(response_list, status=status.HTTP_201_CREATED)
+
+				return Response(response_list, status=status.HTTP_201_CREATED)
+			else:
+				return Response({'Bad Request': 'Possibly you have the wrong file extension or '\
+					'the file is too large.'}, status=status.HTTP_400_BAD_REQUEST)
+			
 		
 		return Response({'Not Found': 'This album does not exist.'}, 
 							status=status.HTTP_404_NOT_FOUND)
@@ -557,29 +564,6 @@ class RandomPublicAlbum(APIView):
 			return Response(AlbumSerializer(random_album).data, status=status.HTTP_200_OK) 
 		return Response({'Not Found': 'No public album available.'}, status=status.HTTP_404_NOT_FOUND)
 
-class GetFirstPhotoFromAlbum(APIView):
-	'''
-		Get first photo from an album
-
-		url_param:
-			None
-			
-		Returns:
-			Success:
-				status 200
-				a list of ('unique_id', 'title', 'description', 'create_at', 'owner', 'public', 'photos')
-			
-			Failure:
-				Error 400 on url_param missing
-				Error 404 on not public album available
-
-	'''
-	def get(self, request, format=None):
-		album_count = Album.objects.filter(public=True).count()
-		if album_count > 0:
-			random_album = Album.objects.filter(public=True)[randint(0, album_count - 1)]
-			return Response(AlbumSerializer(random_album).data, status=status.HTTP_200_OK) 
-		return Response({'Not Found': 'No public album available.'}, status=status.HTTP_404_NOT_FOUND)
 
 class LikeOrUnlikeAPhoto(APIView):
 	'''

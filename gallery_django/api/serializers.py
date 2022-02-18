@@ -1,3 +1,4 @@
+from django.forms import ImageField
 from rest_framework import serializers
 from .models import Album, Photo, PhotoComment, PhotoLike
 from django.contrib.auth import get_user_model
@@ -55,7 +56,9 @@ class PhotoSerializer(serializers.ModelSerializer):
 		model = Photo
 		fields = ('unique_id', 'create_at', 'image', 'belong_to', 'num_of_likes', 'comments')
 		read_only_fields = fields
+
 class CreatePhotoSerializer(serializers.ModelSerializer):
+	image = ImageField()
 	class Meta:
 		model = Photo
 		fields = ('image',)

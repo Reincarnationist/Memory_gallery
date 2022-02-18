@@ -5,7 +5,6 @@ import {
 		Grid,
 		Typography,
 		Button,
-		TextField,
 		Dialog,
 		DialogActions,
 		DialogContent,
@@ -14,9 +13,16 @@ import {
 		Card,
 		CardActions,
 		CardContent,
-		CardMedia  } from '@mui/material';
+		CardMedia,
+		CardActionArea, 
+		List,
+		ListItem,
+		ListItemText  } from '@mui/material';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import AddIcon from '@mui/icons-material/Add';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -25,11 +31,13 @@ export default function AlbumDetail( {csrf_token} ) {
 	const params = useParams()
 	const username_param = params.username
 	const album_id = params.album_id
+	const history = useHistory()
 
 	const [album_title, setAlbum_title] = React.useState('');
 	const [isOwner, setIsOwner] = React.useState(false);
 	const [current_photo_id, setCurrent_photo_id] = React.useState('');
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
+	const [upload_dialog_open, setUpload_dialog_open] = React.useState(false);
 
 	const [photos, setPhotos] = React.useState([])
 	const [not_found, setNot_found] = React.useState(false)
@@ -41,6 +49,9 @@ export default function AlbumDetail( {csrf_token} ) {
 	const [likePhotoErrMsg, setLikePhotoErrMsg] = React.useState('');
 	const [commentPhotoErrMsg, setCommentPhotoErrMsg] = React.useState('');
 	const NOT_FOUND_MESSAGE = 'Sorry, there is no photos in this album at the moment.'
+
+	const [photoAsFile, setPhotoAsFile] = React.useState(null)
+	const [photoNames, setPhotoNames] = React.useState([])
 
 	React.useEffect(() => {
 		const logged_in_user = sessionStorage.getItem('username')
@@ -66,6 +77,11 @@ export default function AlbumDetail( {csrf_token} ) {
 				}
 			})
 			.then(data => {
+				if (data.length === 0){
+					//empty album
+					setNot_found(true)
+					throw new Error('No photo found')
+				}
 				setPhotos(data)
 				album_title === '' ? setAlbum_title(data[0].belong_to) : null
 			})
@@ -77,6 +93,9 @@ export default function AlbumDetail( {csrf_token} ) {
 	const handleDelete_Dialog_Close = () => {
 		setDelete_dialog_open(false)
 	}
+	const handleUpload_Dialog_Close = () => {
+		setUpload_dialog_open(false)
+	}
 
 	const handleSnackBarClose = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -85,31 +104,45 @@ export default function AlbumDetail( {csrf_token} ) {
 		setErrorType('');
 	};
 
+	function onSelectFile(files){
+		
+		setPhotoAsFile(files)
+		Array.from(files).forEach(file =>{
+			photoNames.push(file.name)
+		})
+	}
 	const handleUploadPhoto = async e =>{
 		e.preventDefault()
+		if (photoAsFile === null){
+			setErrorType('upload_photos_error')
+			setUploadPhotoErrMsg('Cannot upload empty file')
+			return
+		}
+
+		const formData = new FormData()
+		for (let i = 0; i < photoAsFile.length; i++) {
+			formData.append('images', photoAsFile[i])
+		}
+		
+
 		const requestOptions = {
 			method: "POST",
 			headers: { 
-				"Content-Type": "application/json",
+				// Include Content-Type will cause django boundary error
+				// "Content-Type": "multipart/form-data",
 				'X-CSRFToken': csrf_token
-					},
-			body: JSON.stringify({
-				title: title,
-				description: description,
-				public: isPublic,
-			}),
+			},
+			body: formData,
 		};
-		fetch("/api/create-album/", requestOptions)
+		fetch("/api/upload-photo/" + '?album_id=' + album_id, requestOptions)
 			.then(res => {
 				if (res.ok){
-					setErrorType('create_album_success')
-					setOpen(false)
+					setErrorType('upload_photos_success')
 				}else{                        
 					return res.text().then(text => {
-						setOpen(false)
-						setErrorType('create_album_error')
-						setCreateAlbumErrMsg(String(text).substring(1,String(text).length - 1))
-						throw new Error('Create Album failed')
+						setErrorType('upload_photos_error')
+						setUploadPhotoErrMsg(String(text).substring(1,String(text).length - 1))
+						throw new Error('Upload Photos failed')
 					})
 				}})
 			.catch(error =>{
@@ -127,24 +160,23 @@ export default function AlbumDetail( {csrf_token} ) {
 				'X-CSRFToken': csrf_token
 			},
 		};
-
-		if (current_album_id === ''){
-			console.log('album_id is empty.')
-			setErrorType('delete_album_error')
+		if (current_photo_id === ''){
+			console.log('photo_id is empty.')
+			setErrorType('delete_photo_error')
 			return
 		}
 
-		fetch("/api/delete-album" + '?album_id=' + current_album_id, requestOptions)
+		fetch("/api/delete-photo" + '?photo_id=' + current_photo_id, requestOptions)
 			.then(res => {
 				if (res.ok){
-					setErrorType('delete_album_success')
+					setErrorType('delete_photo_success')
 					setDelete_dialog_open(false)
 				}else{                        
 					return res.text().then(text => {
 						setDelete_dialog_open(false)
-						setErrorType('delete_album_error')
-						setDeleteAlbumErrMsg(String(text).substring(1,String(text).length - 1))
-						throw new Error('Delete Album failed')
+						setErrorType('delete_photo_error')
+						setDeletePhotoErrMsg(String(text).substring(1,String(text).length - 1))
+						throw new Error('Delete Photo failed')
 					})
 				}})
 			.catch(error =>{
@@ -212,20 +244,76 @@ export default function AlbumDetail( {csrf_token} ) {
 
 			<Grid item xs={isOwner? 8:12}>
 				<Typography variant="h3" component="div" style={{color: '#34568B'}}>
-					You can broswer all the photos in {album_title} now! 
+					{not_found ? 
+					'No photo available in this album'
+					:
+					`You can broswer all the photos in ${album_title} now!`}
 					</Typography>
+
+				{!not_found && 
 				<Typography variant="h4" component="h4">
 					Like or leave a comment if you see some interesting/beautiful photos.
-					</Typography>
+					</Typography>}
 			</Grid>
 			{isOwner &&
 				<Grid item xs={4} align='right'>
-				<Button 
-					variant="contained" 
-					color='primary'
-					onClick={handleUploadPhoto}
-					>Upload Photos</Button>
-				</Grid>
+
+					<Button 
+						variant="contained" 
+						component="span"
+						onClick={() => setUpload_dialog_open(true)}
+						>
+						<PhotoCamera /> &nbsp; Upload Photos
+					</Button>
+					<Dialog
+						open={upload_dialog_open}
+						onClose={handleUpload_Dialog_Close}
+						>
+						<DialogTitle>
+							Upload Photos
+						</DialogTitle>
+						<DialogContent>
+						<DialogContentText>
+							You can upload up to 50 photos per album, the maximum size is 20 MB per image.
+							<br />
+							{photoNames.length !== 0 && 
+								"These files are going to be uploaded: "
+							}
+							{photoNames.join(', ')}
+						</DialogContentText>	
+						</DialogContent>
+						<DialogActions>
+							<Button 
+								color='warning'
+								onClick={() => {
+									setUpload_dialog_open(false);
+									setPhotoAsFile(null);
+									setPhotoNames([]);
+								}}
+								>
+								Cancel
+							</Button>
+						<label htmlFor="upload-photo">
+							<input 
+								accept="image/*" 
+								id="upload-photo" 
+								multiple 
+								type="file" 
+								style={{display:'none'}}
+								onChange={(e) => onSelectFile(e.target.files)}/>
+							<Button 
+								component="span"
+								>
+								<AddIcon /> &nbsp; Select Photos
+							</Button>
+							</label>
+						<Button  onClick={handleUploadPhoto}>
+							<FileUploadIcon /> &nbsp; Upload
+						</Button>
+						</DialogActions>
+						</Dialog>
+			
+				</Grid> 
 			}
 			
 			{not_found ? 
@@ -240,25 +328,28 @@ export default function AlbumDetail( {csrf_token} ) {
 						<Grid item xs={3} key={index}>
 							<Card sx={{ 
 									maxWidth: 300, 
-									maxHeight: 350,
+									maxHeight: 400,
 									display: 'flex', 
 									justifyContent: 'space-between', 
 									flexDirection: 'column' }}>
-								<CardMedia
-									component="img"
-									alt={`photo of ${album_id}`}
-									height="300"
-									image={item.thumb}
-									// style={{width: 250, height: 250, objectFit: 'cover'}}
-								/>
-								<CardContent>
-									<Typography variant="body2" color="text.secondary">
-										{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
-									Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
-									</Typography>
-								</CardContent>
+								<CardActionArea onClick={() => history.push(`/collection/${username_param}/${item.unique_id}`)}>
+									<CardMedia
+										component="img"
+										alt={`photo of ${album_id}`}
+										height="300"
+										image={item.thumb}
+										// style={{width: 250, height: 250, objectFit: 'cover'}}
+									/>
+									<CardContent>
+										<Typography variant="body2" color="text.secondary">
+											{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
+										Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
+										</Typography>
+									</CardContent>
+								</CardActionArea>
+								
+								{isOwner && 
 								<CardActions>
-									{isOwner && 
 									<Button 
 										variant='contained' 
 										size="small" 
@@ -266,8 +357,8 @@ export default function AlbumDetail( {csrf_token} ) {
 										onClick={() =>{
 											setDelete_dialog_open(true); 
 											setCurrent_photo_id(item.unique_id);
-										}}>Delete</Button>}
-								</CardActions>
+										}}>Delete</Button>
+								</CardActions>}
 							</Card>
 						</Grid>
 					))
