@@ -1,25 +1,3 @@
-# Memory Gallery
-
-A fully functional, clean website for sharing photos, it works like a lightweight social media app as you can comment/like others' photos.
-
-Use React as frontend and Material-UI as main ui components.
-
-Django/DRF is the backend part, filled with REST api design.
-
-Aws S3 as storage and RDS-mysql as Database.
-
-Supports User anthentication and original quality photo storage.
-
-
-Problems encountered so far:
-
-User authentication: JWT vs session
-Storage
-Front-end and back-end 
-multiple upload
-generate thumbnail
-
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -59,7 +37,6 @@ generate thumbnail
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -68,7 +45,9 @@ generate thumbnail
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Memory Gallery is a light-weight social media that it's focus is sharing photos. Key features are:
+Memory Gallery is a light-weight social media that it's focus is sharing photos. 
+
+Use React as frontend and Material-UI as main ui components. Django/DRF is the backend part, filled with REST api design. Aws S3 as storage and RDS-mysql as Database. Key features are:
 
 User Authentication
 
