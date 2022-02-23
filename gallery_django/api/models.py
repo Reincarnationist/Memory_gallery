@@ -70,7 +70,6 @@ class Photo(models.Model):
 
 
 	#Kinda slow with PIL opening the whole image to process
-	#might be a better choice to read exif data in the front end
 
 	# @cached_property
 	# def exif(self):

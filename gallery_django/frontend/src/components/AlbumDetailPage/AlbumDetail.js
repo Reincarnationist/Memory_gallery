@@ -15,14 +15,17 @@ import {
 		CardContent,
 		CardMedia,
 		CardActionArea, 
-		List,
-		ListItem,
-		ListItemText  } from '@mui/material';
+		} from '@mui/material';
+
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import { useParams, useHistory } from 'react-router-dom';
+
+import ImageViewer from './ImageViewer';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -52,6 +55,10 @@ export default function AlbumDetail( {csrf_token} ) {
 
 	const [photoAsFile, setPhotoAsFile] = React.useState(null)
 	const [photoNames, setPhotoNames] = React.useState([])
+
+	const [imageList, setImageList] = React.useState([])
+	const [currentImage, setCurrentImage] = React.useState(0)
+	const [isViewerOpen, setIsViewerOpen] = React.useState(false)
 
 	React.useEffect(() => {
 		const logged_in_user = sessionStorage.getItem('username')
@@ -84,6 +91,10 @@ export default function AlbumDetail( {csrf_token} ) {
 				}
 				setPhotos(data)
 				album_title === '' ? setAlbum_title(data[0].belong_to) : null
+
+				let temp_imageList = []
+				data.forEach(image => temp_imageList.push(image.image))
+				setImageList(temp_imageList)
 			})
 			.catch(error => console.log(error))
 
@@ -187,6 +198,18 @@ export default function AlbumDetail( {csrf_token} ) {
 			})
 		
 	}
+
+
+	const openImageViewer = (index) => {
+		setCurrentImage(index);
+		setIsViewerOpen(true);
+	}
+
+	const closeImageViewer = () => {
+		setCurrentImage(0);
+		setIsViewerOpen(false);
+	};
+
 	return (
 		<Grid container spacing={2} style={{flex: 1, width: '80%', margin: 'auto'}} >
 			<Snackbar 
@@ -335,7 +358,7 @@ export default function AlbumDetail( {csrf_token} ) {
 									display: 'flex', 
 									justifyContent: 'space-between', 
 									flexDirection: 'column' }}>
-								<CardActionArea onClick={() => history.push(`/collection/${username_param}/${item.unique_id}`)}>
+								<CardActionArea onClick={() => openImageViewer(index)}>
 									<CardMedia
 										component="img"
 										alt={`photo of ${album_id}`}
@@ -344,10 +367,18 @@ export default function AlbumDetail( {csrf_token} ) {
 										// style={{width: 250, height: 250, objectFit: 'cover'}}
 									/>
 									<CardContent>
-										<Typography variant="body2" color="text.secondary">
-											{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
-										Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
-										</Typography>
+										<Grid container>
+											<Grid item xs={8}>
+												<Typography variant="body2" color="text.secondary">
+													{/* django datetime field:  2022-02-04T01:03:39.531386-05:00*/}
+												Create At: {item.create_at.slice(0, item.create_at.indexOf('T'))}
+												</Typography>
+											</Grid>
+											<Grid item xs={4} align='right'>
+												<FavoriteIcon color='error'/> {item.num_of_likes}
+											</Grid>
+										</Grid>
+										
 									</CardContent>
 								</CardActionArea>
 								
@@ -367,7 +398,21 @@ export default function AlbumDetail( {csrf_token} ) {
 					))
 				
 			}
-			
+		
+
+		{isViewerOpen && (
+			<ImageViewer
+			  src={ imageList }
+			  currentIndex={ currentImage }
+			  disableScroll={ false }
+			  closeOnClickOutside={ true }
+			  onClose={ closeImageViewer }
+			/>
+		)}
+
 		</Grid>
+
+		
+		
 	);
-	}
+}
