@@ -11,7 +11,6 @@ import Account from "./components/AccountPage/Account"
 import Home from "./components/Home"
 import Collection from "./components/CollectionPage/Collection"
 import AlbumDetail from "./components/AlbumDetailPage/AlbumDetail"
-import { getThemeProps } from "@mui/system";
 
 export default function App(){
 	// This token will be changed silently after user login

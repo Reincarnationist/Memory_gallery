@@ -29,6 +29,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Comment out above while deploying to lightsail
+
+# DEBUG = False
+
+# ALLOWED_HOSTS = [ '*' ]
+
 
 # Application definition
 
@@ -143,6 +149,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# run collectstatic while deploy with this 
+#STATIC_ROOT = '/var/www/MGallery.com/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
