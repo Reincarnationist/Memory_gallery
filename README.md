@@ -13,7 +13,7 @@
     <a href="https://github.com/Reincarnationist/Memory_gallery"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="https://memory-gallery.com/">View Demo</a>
     ·
     <a href="https://github.com/Reincarnationist/Memory_gallery/issues">Report Bug</a>
     ·
@@ -73,7 +73,7 @@ No local storage needed, almost everything is on cloud using AWS.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-<a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+<a href="https://memory-gallery.com/">View Demo</a>
 
 
 <!-- ROADMAP -->
