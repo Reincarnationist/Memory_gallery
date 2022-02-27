@@ -22,6 +22,7 @@ export default function DeleteAccount( {csrf_token} ) {
   const [errorType, setErrorType] = React.useState('');
   const [deleteErrMsg, setDeleteErrMsg] = React.useState('');
   const [confirm, setConfirm] = React.useState('');
+
   const CONFIRM = 'Delete My Account'
   const CONFRIM_ERROR_MESSAGE = "Please type the confirm correctly"
   const DELETE_SUCCESS_MESSAGE = "Delete Successfully!"

@@ -36,6 +36,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	const [album_title, setAlbum_title] = React.useState('');
 	const [isOwner, setIsOwner] = React.useState(false);
 	const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+	const [logged_in_user, setLogged_in_user] = React.useState('');
 	const [current_photo_id, setCurrent_photo_id] = React.useState('');
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
 	const [upload_dialog_open, setUpload_dialog_open] = React.useState(false);
@@ -61,6 +62,7 @@ export default function AlbumDetail( {csrf_token} ) {
 		const logged_in_user = sessionStorage.getItem('username')
 		if (logged_in_user){
 			setIsAuthenticated(true)
+			setLogged_in_user(logged_in_user)
 			if (logged_in_user === username_param){
 				setIsOwner(true)
 			}
@@ -408,6 +410,7 @@ export default function AlbumDetail( {csrf_token} ) {
 			  photos={photos}
 			  isOwner={isOwner}
 			  isAuthenticated={isAuthenticated}
+			  logged_in_user={logged_in_user}
 			  csrf_token={csrf_token}
 			/>
 		)}

@@ -6,6 +6,14 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
 
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
@@ -16,11 +24,15 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function ImageViewer(props) {
 	const [currentIndex, setCurrentIndex] = React.useState(props.currentIndex ?? 0);
 	const [liked, setLiked] = React.useState(false);
+	const [comments, setComments] = React.useState([]);
 
 	const [errorType, setErrorType] = React.useState('');
 	const [getPhotoErrMsg, setGetPhotoErrMsg] = React.useState('');
 	const [likePhotoErrMsg, setLikePhotoErrMsg] = React.useState('');
+	const [getPhotoCommentErrMsg, setGetPhotoCommentErrMsg] = React.useState('');
 	const [commentPhotoErrMsg, setCommentPhotoErrMsg] = React.useState('');
+
+	const [open_comment, setOpen_comment] = React.useState(false)
 
 	const OWNER_LIKE_PHOTO = "You can't like your own photos"
 	const USER_NOT_LOGIN = "You need to login to perform this action"
@@ -110,6 +122,23 @@ export default function ImageViewer(props) {
 				setLiked(data['user_likes_this'])
 			})
 			.catch(error => console.log(error))
+
+			fetch('/api/get-comment' + '?photo_id=' + props.photos[currentIndex].unique_id, {method: 'GET'})
+			.then(res => {
+				if (res.ok){
+					return res.json()
+				}else{
+					return res.text().then(text => {
+						setErrorType('get_photo_comment_error')
+						setGetPhotoCommentErrMsg(String(text).substring(1,String(text).length - 1))
+						throw new Error('Get photo comment failed')
+					})
+				}
+			})
+			.then(data => {
+				setComments(data)
+			})
+			.catch(error => console.log(error))
 		}
 		
 	}, [currentIndex]);
@@ -148,6 +177,79 @@ export default function ImageViewer(props) {
 			})
 	}
 
+//create a dialog to let the user enter comment
+	const handleCommentPhoto = async e =>{
+		e.preventDefault()
+		if (!props.isAuthenticated){
+			setErrorType('user_not_login')
+			return
+		}
+		const requestOptions = {
+			method: "PUT",
+			headers: { 
+				'X-CSRFToken': props.csrf_token
+			},
+		};
+		fetch("/api/create-comment/" + '?photo_id=' + props.photos[currentIndex].unique_id, requestOptions)
+			.then(res => {
+				if (res.ok){
+					return res.json()
+				}else{                        
+					return res.text().then(text => {
+						setErrorType('comment_photo_error')
+						setCommentPhotoErrMsg(String(text).substring(1,String(text).length - 1))
+						throw new Error('Comment Photo failed')
+					})
+				}})
+			.catch(error =>{
+				console.log(error)
+			})
+	}
+
+	const toggleDrawer = (open) => (event) => {
+		if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+		  return;
+		}
+	
+		setOpen_comment(open);
+	};
+
+	const list = () => (
+		<Box
+		  sx={{'auto' : 250 }}
+		  role="presentation"
+		  onClick={toggleDrawer(false)}
+		  onKeyDown={toggleDrawer(false)}
+		>
+		  <List>
+			{comments.map((item, index) => (
+			  <ListItem key={index}>
+				  <a 
+				  	href={'https://www.memory-gallery.com/collection/' + item.owner}
+                	target='_blank'
+                	rel="noreferrer"
+					style={{textDecoration: 'none'}}
+					>{item.owner}
+					</a>
+				<ListItemText primary={' @ ' + item.timestamp.slice(0, 10) + ': ' + item.content} /> 
+				{item.owner===props.logged_in_user? <Button>Delete</Button>:null}
+			  </ListItem>
+			))}
+
+			<Divider />
+			<ListItem button>
+				<Button 
+				variant='contained' 
+				color='primary' 
+				onClick={handleCommentPhoto}
+				> Add Comment 
+				</Button>
+			</ListItem>
+		  </List>
+		  
+		</Box>
+	  );
+
 	return (
 		<div
 			id='ImageViewer'
@@ -160,7 +262,11 @@ export default function ImageViewer(props) {
 					errorType === 'get_photo_like_error' || 
 					errorType === 'owner_like_photo' ||
 					errorType === 'user_not_login' ||
-					errorType === 'like_photo_error' 
+					errorType === 'like_photo_error' ||
+					errorType === 'get_photo_comment_error' ||
+					errorType === 'comment_photo_error' ||
+					errorType === 'delete_photo_comment_error' 
+					
 
 				} 
 				autoHideDuration={6000} 
@@ -215,11 +321,17 @@ export default function ImageViewer(props) {
 
 			<span
 			className='comment_button'
-			onClick={() => props.onClose()}
+			onClick={toggleDrawer(true)}
 			>
 			<CommentIcon fontSize="large"/>
 			</span>	
-				
+			<Drawer
+				anchor={'bottom'}
+				open={open_comment}
+				onClose={toggleDrawer(false)}
+			>
+            {list()}
+          	</Drawer>
 
 			{props.src.length > 1 && (
 			<span
