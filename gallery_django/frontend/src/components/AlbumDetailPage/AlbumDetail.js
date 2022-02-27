@@ -21,11 +21,9 @@ import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { useParams } from 'react-router-dom';
 
-import { useParams, useHistory } from 'react-router-dom';
-
-import ImageViewer from './ImageViewer';
+import ImageViewer from '../PhotoDetail/ImageViewer';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -34,10 +32,10 @@ export default function AlbumDetail( {csrf_token} ) {
 	const params = useParams()
 	const username_param = params.username
 	const album_id = params.album_id
-	const history = useHistory()
 
 	const [album_title, setAlbum_title] = React.useState('');
 	const [isOwner, setIsOwner] = React.useState(false);
+	const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 	const [current_photo_id, setCurrent_photo_id] = React.useState('');
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
 	const [upload_dialog_open, setUpload_dialog_open] = React.useState(false);
@@ -49,8 +47,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	const [getPhotosErrMsg, setGetPhotosErrMsg] = React.useState('');
 	const [uploadPhotoErrMsg, setUploadPhotoErrMsg] = React.useState('');
 	const [deletePhotoErrMsg, setDeletePhotoErrMsg] = React.useState('');
-	const [likePhotoErrMsg, setLikePhotoErrMsg] = React.useState('');
-	const [commentPhotoErrMsg, setCommentPhotoErrMsg] = React.useState('');
+	
 	const NOT_FOUND_MESSAGE = 'Sorry, there is no photos in this album at the moment.'
 
 	const [photoAsFile, setPhotoAsFile] = React.useState(null)
@@ -63,6 +60,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	React.useEffect(() => {
 		const logged_in_user = sessionStorage.getItem('username')
 		if (logged_in_user){
+			setIsAuthenticated(true)
 			if (logged_in_user === username_param){
 				setIsOwner(true)
 			}
@@ -79,7 +77,7 @@ export default function AlbumDetail( {csrf_token} ) {
 					return res.text().then(text => {
 						setErrorType('get_photos_error')
 						setGetPhotosErrMsg(String(text).substring(1,String(text).length - 1))
-						throw new Error('Get albums failed')
+						throw new Error('Get photos failed')
 					})
 				}
 			})
@@ -407,6 +405,10 @@ export default function AlbumDetail( {csrf_token} ) {
 			  disableScroll={ false }
 			  closeOnClickOutside={ true }
 			  onClose={ closeImageViewer }
+			  photos={photos}
+			  isOwner={isOwner}
+			  isAuthenticated={isAuthenticated}
+			  csrf_token={csrf_token}
 			/>
 		)}
 

@@ -57,9 +57,30 @@
 	opacity: 0.2;
 }
 
-.close:hover {
+.like_button {
+	color: white;
+	position: absolute;
+	bottom: 15px;
+	right: 100px;
+	font-weight: bold;
+	opacity: 0.4;
+	cursor: pointer;
+}
+
+.comment_button {
+	color: white;
+	position: absolute;
+	bottom: 15px;
+	right: 50px;
+	font-weight: bold;
+	opacity: 0.4;
+	cursor: pointer;
+}
+
+.close:hover, .like_button:hover, .comment_button:hover {
 	opacity: 1;
 }
+
 
 .navigation {
 	height: 80%;

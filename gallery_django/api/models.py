@@ -102,7 +102,7 @@ class Photo(models.Model):
 
 class PhotoComment(models.Model):
 	unique_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-	owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	timestamp = models.DateTimeField(auto_now_add=True)
 	belong_to = models.ForeignKey(Photo, related_name='comments', on_delete=models.CASCADE)
 	content = models.CharField(max_length=50)
