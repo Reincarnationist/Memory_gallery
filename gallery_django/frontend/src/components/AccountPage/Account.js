@@ -54,7 +54,7 @@ export default function VerticalTabs( {csrf_token} ) {
 			history.push("/authenticate/")
 			
 		}
-  });
+  }, []);
 
   const handleChange = (event, newValue) => {
 	setValue(newValue);

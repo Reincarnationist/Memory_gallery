@@ -40,6 +40,7 @@ export default function Collection( {csrf_token} ) {
 	const [current_album_id, setCurrent_album_id] = React.useState('');
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
 
+	const [state_for_reload, setState_for_reload] = React.useState(0)
 	const [albums, setAlbums] = React.useState([])
 	const [not_found, setNot_found] = React.useState(false)
 
@@ -93,7 +94,7 @@ export default function Collection( {csrf_token} ) {
 			})
 			.then(data => setAlbums(data))
 			.catch(error => console.log(error))
-	}, []);
+	}, [state_for_reload]);
 	
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -137,6 +138,7 @@ export default function Collection( {csrf_token} ) {
 				if (res.ok){
 					setErrorType('create_album_success')
 					setOpen(false)
+					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
 						setOpen(false)
@@ -175,6 +177,7 @@ export default function Collection( {csrf_token} ) {
 				if (res.ok){
 					setErrorType('update_album_success')
 					setOpen(false)
+					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
 						setOpen(false)
@@ -209,6 +212,7 @@ export default function Collection( {csrf_token} ) {
 				if (res.ok){
 					setErrorType('delete_album_success')
 					setDelete_dialog_open(false)
+					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
 						setDelete_dialog_open(false)

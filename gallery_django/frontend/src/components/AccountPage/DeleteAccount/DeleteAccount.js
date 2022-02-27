@@ -24,7 +24,7 @@ export default function DeleteAccount( {csrf_token} ) {
   const [confirm, setConfirm] = React.useState('');
 
   const CONFIRM = 'Delete My Account'
-  const CONFRIM_ERROR_MESSAGE = "Please type the confirm correctly"
+  const CONFIRM_ERROR_MESSAGE = "Please type the confirm correctly"
   const DELETE_SUCCESS_MESSAGE = "Delete Successfully!"
   const history = useHistory();
 
@@ -52,7 +52,12 @@ export default function DeleteAccount( {csrf_token} ) {
         setErrorType('confirm_error');
     }else{
 
-    
+    // Known issue here, after the user deletes his account, the header will remain 'setting/logout'
+	// that's because the header's authentication state is local
+	// In order to solve this problem we need to move authentication to props and pass it down to both
+	// header and deleteAccount component so that then a user deletes his account the header knows
+	// he is not authenticated anymore. I'll leave it as it because it is not that critical.
+	// The current solution is force refresh the page after successfully delete which is not recommanded
 	fetch("/auth/delete-user/", {
 		method: "DELETE",
 		headers: { 
@@ -81,10 +86,9 @@ export default function DeleteAccount( {csrf_token} ) {
 				// 	errorMsg: 'Error Code: ' + res.status + ': ' + 'The login process failed, please try again.'
 				// })
 			}})
-		.then((data) => {
+		.then(() => {
 			sessionStorage.removeItem('username')
-			setTimeout(() => history.push("/"), 3000);
-			
+			setTimeout(() => window.location.reload(), 3000);
 		})
 		.catch(error =>{
 			console.log(error)
@@ -100,7 +104,7 @@ export default function DeleteAccount( {csrf_token} ) {
 			Note: this can be fixed by adding one more state for opening/closing, leave it for later*/}
         <Snackbar open={errorType==='confirm_error'} autoHideDuration={6000} onClose={handleSnackBarClose}>
         <Alert onClose={handleSnackBarClose} severity="error" sx={{ width: '100%' }}>
-          {CONFRIM_ERROR_MESSAGE}
+          {CONFIRM_ERROR_MESSAGE}
         </Alert></Snackbar>
 
 		<Snackbar open={errorType==='delete_error_error'} autoHideDuration={6000} onClose={handleSnackBarClose}>

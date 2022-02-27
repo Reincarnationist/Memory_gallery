@@ -47,7 +47,7 @@ export default function Header( {csrf_token} ){
 			setAuthenticated(true)
 			setAuthenticated_username(logged_in_user)
 		}
-	  });
+	});
 	
 	const handleLogout = async e =>{
 		e.preventDefault()

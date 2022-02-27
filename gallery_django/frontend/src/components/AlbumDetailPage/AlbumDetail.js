@@ -41,6 +41,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
 	const [upload_dialog_open, setUpload_dialog_open] = React.useState(false);
 
+	const [state_for_reload, setState_for_reload] = React.useState(0)
 	const [photos, setPhotos] = React.useState([])
 	const [not_found, setNot_found] = React.useState(false)
 
@@ -98,7 +99,7 @@ export default function AlbumDetail( {csrf_token} ) {
 			})
 			.catch(error => console.log(error))
 
-	}, []);
+	}, [state_for_reload]);
 	
 
 	const handleDelete_Dialog_Close = () => {
@@ -152,6 +153,7 @@ export default function AlbumDetail( {csrf_token} ) {
 					setPhotoAsFile(null)
 					setPhotoNames([])
 					setErrorType('upload_photos_success')
+					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
 						setErrorType('upload_photos_error')
@@ -185,6 +187,7 @@ export default function AlbumDetail( {csrf_token} ) {
 				if (res.ok){
 					setErrorType('delete_photo_success')
 					setDelete_dialog_open(false)
+					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
 						setDelete_dialog_open(false)
