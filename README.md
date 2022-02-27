@@ -80,11 +80,10 @@ No local storage needed, almost everything is on cloud using AWS.
 ## Roadmap
 
 - [ ] Add email identification while registering
-- [ ] Add 'my likes and comments' in account page
 - [ ] Add progress indicator while uploading photos
 - [ ] Add 'my likes' section in the account page and finish up the rest account page features
 - [ ] Add notification 
-- [ ] Add FeelingLucky page
+- [ ] Finish FeelingLucky page
 
 
 <!-- LICENSE -->
