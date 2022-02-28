@@ -38,7 +38,7 @@ export default function Authentication( {csrf_token, setCsrfChange} ) {
 		if (logged_in_user){
 			setAuthenticated_username(logged_in_user)
 		}
-	}, [authenticated_username]);
+	});
 
 
 	const handleLoginFormSubitted = async e =>{

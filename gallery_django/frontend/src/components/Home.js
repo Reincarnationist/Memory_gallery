@@ -22,6 +22,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function Home() {
 	const [albums, setAlbums] = React.useState([])
 	const [ready, setReady] = React.useState(false)
+	const [empty, setEmpty] = React.useState(false)
 	const [getPublicAlbumsErrMsg, setGetPublicAlbumsErrMsg] = React.useState('')
 	const history = useHistory()
 	const handleSnackBarClose = (event, reason) => {
@@ -36,6 +37,10 @@ export default function Home() {
 			.then(res => {
 				if (res.ok){
 					return res.json()
+				}else if(res.status === 404){
+					setReady(true)
+					setEmpty(true)
+					throw new Error('No albums found')
 				}else{
 					return res.text().then(text => {
 						setGetPublicAlbumsErrMsg(String(text).substring(1,String(text).length - 1))
@@ -46,11 +51,17 @@ export default function Home() {
 			.then(data => {
 				setAlbums(data)
 				setReady(true)
+				setEmpty(false)
 			})
 			.catch(error => console.log(error))
 	  }, []);
 
 	  return ready ? (
+		  	empty ? 
+			  <div style={{flex: 1}}>
+				  Sorry, there is no album posted but you can be the first person to upload one!
+			  </div>
+			  :
 			<Grid container spacing={2} style={{flex: 1, width: '80%', margin: 'auto'}} >
 				<Snackbar open={getPublicAlbumsErrMsg !== ''} autoHideDuration={6000} onClose={handleSnackBarClose}>
 					<Alert onClose={handleSnackBarClose} severity="error" sx={{ width: '100%' }}>

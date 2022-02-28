@@ -21,6 +21,8 @@ import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import LinearProgress from '@mui/material/LinearProgress';
+
 import { useParams } from 'react-router-dom';
 
 import ImageViewer from '../PhotoDetail/ImageViewer';
@@ -58,7 +60,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	const [imageList, setImageList] = React.useState([])
 	const [currentImage, setCurrentImage] = React.useState(0)
 	const [isViewerOpen, setIsViewerOpen] = React.useState(false)
-
+	const [uploading, setUploading] = React.useState(false)
 	React.useEffect(() => {
 		const logged_in_user = sessionStorage.getItem('username')
 		if (logged_in_user){
@@ -109,6 +111,7 @@ export default function AlbumDetail( {csrf_token} ) {
 	}
 	const handleUpload_Dialog_Close = () => {
 		setUpload_dialog_open(false)
+		setUploading(false)
 	}
 
 	const handleSnackBarClose = (event, reason) => {
@@ -126,6 +129,7 @@ export default function AlbumDetail( {csrf_token} ) {
 		})
 	}
 	const handleUploadPhoto = async e =>{
+		
 		e.preventDefault()
 		if (photoAsFile === null){
 			setErrorType('upload_photos_error')
@@ -138,7 +142,7 @@ export default function AlbumDetail( {csrf_token} ) {
 			formData.append('images', photoAsFile[i])
 		}
 		
-
+		setUploading(true)
 		const requestOptions = {
 			method: "POST",
 			headers: { 
@@ -151,18 +155,20 @@ export default function AlbumDetail( {csrf_token} ) {
 		fetch("/api/upload-photo/" + '?album_id=' + album_id, requestOptions)
 			.then(res => {
 				if (res.ok){
-					setUpload_dialog_open(false)
-					setPhotoAsFile(null)
-					setPhotoNames([])
 					setErrorType('upload_photos_success')
 					setState_for_reload(prev => prev + 1)
-				}else{                        
+				}else{               
 					return res.text().then(text => {
 						setErrorType('upload_photos_error')
 						setUploadPhotoErrMsg(String(text).substring(1,String(text).length - 1))
 						throw new Error('Upload Photos failed')
 					})
-				}})
+				}
+				setUpload_dialog_open(false)
+				setPhotoAsFile(null)
+				setPhotoNames([])
+				setUploading(false)
+			})
 			.catch(error =>{
 				console.log(error)
 			})
@@ -311,6 +317,8 @@ export default function AlbumDetail( {csrf_token} ) {
 								"These files are going to be uploaded: "
 							}
 							{photoNames.join(', ')}
+							<br />
+							{uploading && <LinearProgress />}
 						</DialogContentText>	
 						</DialogContent>
 						<DialogActions>
@@ -320,6 +328,7 @@ export default function AlbumDetail( {csrf_token} ) {
 									setUpload_dialog_open(false);
 									setPhotoAsFile(null);
 									setPhotoNames([]);
+									setUploading(false)
 								}}
 								>
 								Cancel

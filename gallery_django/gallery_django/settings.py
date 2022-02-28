@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+# WARNING regards to gunicorn, mutiple workers will break authentication system!!!
 from pathlib import Path
 from .credentials import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, \
             AWS_MYSQL_ENDPOINT, AWS_MYSQL_USERNAME, AWS_MYSQL_PASSWORD, \
             DJANGO_SECRET_KEY
+#from django.core.management.utils import get_random_secret_key
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = DJANGO_SECRET_KEY
+SECRET_KEY = DJANGO_SECRET_KEY #get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -177,5 +179,5 @@ MEDIA_URL = '{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = 'imagekit.cachefiles.strategies.Optimistic'
 
 #Auto log out user while broser closes, SESSION_ENGINE set is necessory
-# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-# SESSION_EXPIRE_AT_BROWSER_CLOSE=True
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
