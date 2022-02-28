@@ -105,7 +105,7 @@ class PhotoComment(models.Model):
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	timestamp = models.DateTimeField(auto_now_add=True)
 	belong_to = models.ForeignKey(Photo, related_name='comments', on_delete=models.CASCADE)
-	content = models.CharField(max_length=50)
+	content = models.CharField(max_length=50, null=False, blank=False)
 
 	class Meta:
 		ordering = ['-timestamp']

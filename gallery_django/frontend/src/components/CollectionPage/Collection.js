@@ -32,12 +32,14 @@ export default function Collection( {csrf_token} ) {
 	const history = useHistory()
 
 	const [isOwner, setIsOwner] = React.useState(false);
-	const [open, setOpen] = React.useState(false);
+	
 	const [title, setTitle] = React.useState('New Album');
 	const [description, setDescription] = React.useState('');
 	const [isPublic, setIsPublic] = React.useState(true);
 	const [album_editing_status, setAlbum_editing_status] = React.useState('');
 	const [current_album_id, setCurrent_album_id] = React.useState('');
+	
+	const [create_dialog_open, setCreate_dialog_open] = React.useState(false);
 	const [delete_dialog_open, setDelete_dialog_open] = React.useState(false);
 
 	const [state_for_reload, setState_for_reload] = React.useState(0)
@@ -59,6 +61,7 @@ export default function Collection( {csrf_token} ) {
 				fetch('/api/get-my-albums/', {method: 'GET'})
 					.then(res => {
 						if (res.ok){
+							setNot_found(false)
 							return res.json()
 						}else if ( res.status === 404){
 							// 404
@@ -85,6 +88,7 @@ export default function Collection( {csrf_token} ) {
 		fetch('/api/get-user-public-albums' + '?username=' + username_param, {method: "GET"})
 			.then(res => {
 				if (res.ok){
+					setNot_found(false)
 					return res.json()
 				}else{
 					// 404
@@ -97,11 +101,11 @@ export default function Collection( {csrf_token} ) {
 	}, [state_for_reload]);
 	
 	const handleClickOpen = () => {
-		setOpen(true);
+		setCreate_dialog_open(true);
 	};
 
 	const handleClose = () => {
-		setOpen(false);
+		setCreate_dialog_open(false);
 	};
 
 	const handleDelete_Dialog_Close = () => {
@@ -137,11 +141,11 @@ export default function Collection( {csrf_token} ) {
 			.then(res => {
 				if (res.ok){
 					setErrorType('create_album_success')
-					setOpen(false)
+					setCreate_dialog_open(false)
 					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
-						setOpen(false)
+						setCreate_dialog_open(false)
 						setErrorType('create_album_error')
 						setCreateAlbumErrMsg(String(text).substring(1,String(text).length - 1))
 						throw new Error('Create Album failed')
@@ -176,11 +180,11 @@ export default function Collection( {csrf_token} ) {
 			.then(res => {
 				if (res.ok){
 					setErrorType('update_album_success')
-					setOpen(false)
+					setCreate_dialog_open(false)
 					setState_for_reload(prev => prev + 1)
 				}else{                        
 					return res.text().then(text => {
-						setOpen(false)
+						setCreate_dialog_open(false)
 						setErrorType('update_album_error')
 						setUpdateAlbumErrMsg(String(text).substring(1,String(text).length - 1))
 						throw new Error('Update Album failed')
@@ -259,7 +263,7 @@ export default function Collection( {csrf_token} ) {
 			</Snackbar>
 
 			{/* Create Album form dialog*/}
-			<Dialog open={open} onClose={handleClose}>
+			<Dialog open={create_dialog_open} onClose={handleClose}>
 				<DialogTitle>
 					{album_editing_status === 'create' ? "Create An Album" : "Update the Album"}
 					</DialogTitle>
@@ -351,7 +355,7 @@ export default function Collection( {csrf_token} ) {
 					variant="contained" 
 					color='primary'
 					onClick={() => {
-						setOpen(true); 
+						setCreate_dialog_open(true); 
 						setAlbum_editing_status('create');
 						// below is for the case the user clicks the update button then close them
 						// need to reset the value
@@ -411,7 +415,7 @@ export default function Collection( {csrf_token} ) {
 										variant='contained' 
 										size="small"
 										onClick={() => {
-											setOpen(true); 
+											setCreate_dialog_open(true); 
 											setAlbum_editing_status('update');
 											setCurrent_album_id(item.unique_id);
 											setTitle(item.title);

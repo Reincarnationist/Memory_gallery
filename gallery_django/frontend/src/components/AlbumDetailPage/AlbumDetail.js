@@ -72,6 +72,7 @@ export default function AlbumDetail( {csrf_token} ) {
 		fetch('/api/get-photo-from-album' + '?album_id=' + album_id, {method: 'GET'})
 			.then(res => {
 				if (res.ok){
+					setNot_found(false)
 					return res.json()
 				}else if(res.status === 404){
 					setNot_found(true)
@@ -90,6 +91,7 @@ export default function AlbumDetail( {csrf_token} ) {
 					setNot_found(true)
 					throw new Error('No photo found')
 				}
+				setNot_found(false)
 				setPhotos(data)
 				album_title === '' ? setAlbum_title(data[0].belong_to) : null
 
