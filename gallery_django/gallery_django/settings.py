@@ -179,5 +179,9 @@ MEDIA_URL = '{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = 'imagekit.cachefiles.strategies.Optimistic'
 
 #Auto log out user while broser closes, SESSION_ENGINE set is necessory
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+#SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+# WARNING
+# The SESSION_ENGINE setting will destory the authentication system while 
+# the number of gunicorn workers is greater than 1. The session is gone completely.
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
