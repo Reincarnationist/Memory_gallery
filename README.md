@@ -47,7 +47,7 @@
 
 Memory Gallery is a light-weight social media that it's focus is sharing photos. 
 
-Use React as frontend and Material-UI as main ui components. Django/DRF is the backend part, filled with REST api design. Aws S3 as storage and RDS-mysql as Database. Key features are:
+Use React as frontend and Material-UI as main ui components. Django/DRF is the backend part, filled with REST api design. Aws S3 as storage and Aws RDS-mysql as Database. Key features are:
 
 User Authentication
 
